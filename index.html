@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>MyFisika — Selamat Datang</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root{
+  --bg:#eef4ff;
+  --surface:#ffffff;
+  --text:#0f1f3d;
+  --text-2:#334768;
+  --muted:#6b7c96;
+
+  --blue:#2563eb;
+  --blue-lite:#60a5fa;
+  --blue-soft:#dbeafe;
+  --blue-border:#93c5fd;
+
+  --purple:#7c3aed;
+  --purple-soft:#ede9fe;
+
+  --teal:#0d9488;
+  --teal-soft:#ccfbf1;
+
+  --amber:#d97706;
+  --amber-soft:#fef3c7;
+
+  --pink:#db2777;
+  --pink-soft:#fce7f3;
+
+  --ease:cubic-bezier(.4,0,.2,1);
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  position:fixed;inset:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;font-size:inherit}
+i{line-height:1;display:inline-flex}
+
+/* ============ BACKGROUND ============ */
+.splash{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 30px) 26px calc(var(--safe-bottom) + 30px);
+  overflow:hidden;
+  isolation:isolate;
+}
+.splash::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background:var(--bg);
+}
+.splash::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle, var(--blue-soft) 40px, transparent 41px),
+    radial-gradient(circle, var(--purple-soft) 32px, transparent 33px),
+    radial-gradient(circle, var(--teal-soft) 36px, transparent 37px),
+    radial-gradient(circle, var(--amber-soft) 26px, transparent 27px),
+    radial-gradient(circle, var(--pink-soft) 30px, transparent 31px);
+  background-size:340px 340px,300px 300px,320px 320px,260px 260px,280px 280px;
+  background-position:-70px 8%,92% 15%,8% 58%,95% 78%,-60px 92%;
+  background-repeat:no-repeat;
+  opacity:.85;
+}
+
+/* ============ FLOATING ORBS (ANIMASI) ============ */
+.orb{
+  position:absolute;border-radius:50%;
+  pointer-events:none;z-index:1;
+  opacity:.55;
+  animation:float 8s ease-in-out infinite;
+}
+.orb.o1{
+  width:120px;height:120px;
+  background:radial-gradient(circle at 35% 35%, var(--blue-lite), var(--blue));
+  top:8%;left:-30px;
+  filter:blur(2px);
+  animation-delay:0s;
+}
+.orb.o2{
+  width:80px;height:80px;
+  background:radial-gradient(circle at 35% 35%, #c4b5fd, var(--purple));
+  top:22%;right:-20px;
+  filter:blur(1px);
+  animation-delay:-2s;
+}
+.orb.o3{
+  width:140px;height:140px;
+  background:radial-gradient(circle at 35% 35%, #5eead4, var(--teal));
+  bottom:14%;left:-40px;
+  filter:blur(3px);
+  opacity:.4;
+  animation-delay:-4s;
+}
+.orb.o4{
+  width:70px;height:70px;
+  background:radial-gradient(circle at 35% 35%, #fcd34d, var(--amber));
+  bottom:28%;right:-15px;
+  filter:blur(1px);
+  opacity:.5;
+  animation-delay:-6s;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) translateX(0) scale(1)}
+  33%{transform:translateY(-18px) translateX(10px) scale(1.05)}
+  66%{transform:translateY(10px) translateX(-12px) scale(.95)}
+}
+
+/* ============ TOP SECTION ============ */
+.top{
+  position:relative;z-index:5;
+  width:100%;
+  display:flex;justify-content:center;
+  padding-top:14px;
+}
+.univ-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:999px;
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:2px solid #ffffff;
+  box-shadow:0 4px 14px rgba(37,99,235,.12);
+  font-size:11px;font-weight:800;
+  color:var(--blue);
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.univ-badge i{
+  font-size:12px;color:var(--blue);
+}
+
+/* ============ CENTER LOGO ============ */
+.center{
+  position:relative;z-index:5;
+  flex:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:22px;
+  width:100%;
+}
+.logo-wrap{
+  position:relative;
+  width:150px;height:150px;
+  display:grid;place-items:center;
+}
+.logo-ring{
+  position:absolute;inset:0;
+  border-radius:50%;
+  border:3px dashed var(--blue-border);
+  animation:spin 18s linear infinite;
+}
+.logo-ring.r2{
+  inset:14px;
+  border:3px solid var(--blue-soft);
+  border-top-color:var(--blue);
+  animation:spin 3s linear infinite reverse;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.logo-mark{
+  position:relative;
+  width:100px;height:100px;
+  border-radius:28px;
+  display:grid;place-items:center;
+  background:var(--blue);
+  color:#ffffff;font-size:44px;
+  border:5px solid #ffffff;
+  box-shadow:
+    0 8px 0 var(--blue-border),
+    0 14px 30px rgba(37,99,235,.35);
+  transform:rotate(-6deg);
+  animation:bounce 3s ease-in-out infinite;
+  z-index:2;
+}
+.logo-mark::after{
+  content:'';position:absolute;inset:-6px;
+  border-radius:34px;
+  border:2px solid var(--blue-soft);
+  animation:ping 2.5s ease-out infinite;
+}
+@keyframes bounce{
+  0%,100%{transform:rotate(-6deg) translateY(0)}
+  50%{transform:rotate(-6deg) translateY(-8px)}
+}
+@keyframes ping{
+  0%{transform:scale(.95);opacity:1}
+  100%{transform:scale(1.35);opacity:0}
+}
+
+.brand{
+  text-align:center;
+  animation:fadeUp .8s var(--ease) both;
+  animation-delay:.15s;
+}
+.brand-name{
+  font-size:36px;font-weight:800;
+  letter-spacing:-1.2px;line-height:1.05;
+  color:var(--text);margin-bottom:10px;
+}
+.brand-name b{
+  color:var(--blue);font-weight:800;
+  position:relative;display:inline-block;
+}
+.brand-name b::after{
+  content:'';position:absolute;
+  bottom:-2px;left:0;right:0;
+  height:6px;border-radius:6px;
+  background:var(--blue-soft);
+  z-index:-1;
+}
+.brand-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:999px;
+  background:#ffffff;
+  border:2px solid var(--blue-border);
+  color:var(--blue);
+  font-size:11px;font-weight:800;
+  letter-spacing:1.5px;
+  box-shadow:0 3px 0 var(--blue-border);
+}
+.brand-tag i{font-size:12px}
+
+.brand-desc{
+  max-width:300px;
+  text-align:center;
+  font-size:13px;line-height:1.65;
+  color:var(--text-2);font-weight:500;
+  animation:fadeUp .8s var(--ease) both;
+  animation-delay:.28s;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ============ LOADING BAR ============ */
+.loading{
+  position:relative;z-index:5;
+  width:100%;max-width:240px;
+  margin-top:6px;
+  animation:fadeUp .8s var(--ease) both;
+  animation-delay:.42s;
+}
+.load-bar{
+  width:100%;height:6px;
+  background:rgba(37,99,235,.12);
+  border-radius:999px;
+  overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(37,99,235,.08);
+}
+.load-fill{
+  height:100%;width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg, var(--blue), var(--blue-lite));
+  animation:load 4.6s ease-in-out forwards;
+  box-shadow:0 0 12px rgba(37,99,235,.5);
+}
+@keyframes load{
+  0%{width:0%}
+  25%{width:32%}
+  55%{width:58%}
+  80%{width:86%}
+  100%{width:100%}
+}
+.load-text{
+  margin-top:10px;
+  text-align:center;
+  font-size:10.5px;font-weight:800;
+  letter-spacing:1.3px;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+/* ============ BOTTOM: CREDITS ============ */
+.bottom{
+  position:relative;z-index:5;
+  width:100%;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:18px;
+  animation:fadeUp .8s var(--ease) both;
+  animation-delay:.55s;
+}
+
+/* ============================================================
+   CREDITS — SIMPEL & ELEGAN
+   ============================================================ */
+.credits{
+  width:100%;max-width:320px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+
+.credits-label{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 12px;border-radius:999px;
+  background:rgba(255,255,255,.7);
+  border:1.5px solid rgba(147,197,253,.6);
+  font-size:9.5px;font-weight:800;
+  letter-spacing:1.3px;text-transform:uppercase;
+  color:var(--blue);
+}
+.credits-label i{font-size:10px}
+
+/* Avatar grup — bulat berjejer dengan inisial */
+.credit-avatars{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.avatar{
+  width:44px;height:44px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  color:#ffffff;
+  font-size:14px;font-weight:800;
+  letter-spacing:-.3px;
+  border:3px solid #ffffff;
+  box-shadow:0 4px 12px rgba(15,31,61,.18);
+  margin-left:-12px;
+  position:relative;
+  transition:transform .25s var(--ease);
+}
+.avatar:first-child{margin-left:0}
+.avatar:hover{transform:translateY(-4px) scale(1.08);z-index:3}
+
+.avatar.a1{background:linear-gradient(135deg, var(--blue), var(--blue-lite));z-index:1}
+.avatar.a2{background:linear-gradient(135deg, var(--purple), #c4b5fd);z-index:2}
+.avatar.a3{background:linear-gradient(135deg, var(--teal), #5eead4);z-index:1}
+
+/* Nama digabung jadi satu baris */
+.credit-names{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-2);
+  text-align:center;
+  letter-spacing:.1px;
+  line-height:1.5;
+}
+.credit-names b{
+  color:var(--text);
+  font-weight:800;
+}
+
+/* Copyright super tipis */
+.copyright{
+  font-size:9.5px;
+  color:var(--muted);
+  font-weight:600;
+  letter-spacing:.4px;
+  text-align:center;
+  opacity:.75;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-height:680px){
+  .logo-wrap{width:120px;height:120px}
+  .logo-mark{width:84px;height:84px;font-size:36px;border-radius:24px}
+  .brand-name{font-size:30px}
+  .brand-desc{font-size:12px;max-width:280px}
+  .center{gap:16px}
+  .avatar{width:40px;height:40px;font-size:13px}
+}
+
+@media (min-width:520px){
+  .brand-name{font-size:42px}
+  .logo-wrap{width:170px;height:170px}
+  .logo-mark{width:116px;height:116px;font-size:50px}
+  .brand-desc{font-size:14px;max-width:360px}
+  .credits{max-width:360px}
+  .avatar{width:48px;height:48px;font-size:15px}
+}
+
+/* Fade out saat pindah */
+.splash.leaving{
+  animation:fadeOut .55s var(--ease) forwards;
+}
+@keyframes fadeOut{
+  to{opacity:0;transform:scale(1.04)}
+}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash">
+
+  <!-- Ornamen bulat melayang -->
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="orb o4"></div>
+
+  <!-- ===== TOP : Badge ===== -->
+  <div class="top">
+    <div class="univ-badge">
+      <i class="fa-solid fa-graduation-cap"></i>
+      Media Pembelajaran Fisika
+    </div>
+  </div>
+
+  <!-- ===== CENTER : Logo & Brand ===== -->
+  <div class="center">
+
+    <div class="logo-wrap">
+      <div class="logo-ring"></div>
+      <div class="logo-ring r2"></div>
+      <div class="logo-mark">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+    </div>
+
+    <div class="brand">
+      <div class="brand-name">My<b>Fisika</b></div>
+      <div class="brand-tag">
+        <i class="fa-solid fa-atom"></i>
+        BELAJAR LISTRIK
+      </div>
+    </div>
+
+    <p class="brand-desc">
+      Jelajahi dunia kelistrikan lewat visual 3D interaktif — dari alur listrik hingga rangkaian seri &amp; paralel.
+    </p>
+
+    <div class="loading">
+      <div class="load-bar">
+        <div class="load-fill"></div>
+      </div>
+      <div class="load-text" id="loadText">Menyiapkan aplikasi…</div>
+    </div>
+
+  </div>
+
+  <!-- ===== BOTTOM : Credit Simpel ===== -->
+  <div class="bottom">
+
+    <div class="credits">
+
+      <div class="credits-label">
+        <i class="fa-solid fa-heart"></i>
+        Dikembangkan oleh
+      </div>
+
+      <!-- Avatar bulat berjejer dengan inisial nama -->
+      <div class="credit-avatars">
+        <div class="avatar a1" title="Masrifah">M</div>
+        <div class="avatar a2" title="Iqbal Limatahu">IL</div>
+        <div class="avatar a3" title="Nurfatimah Sugrah">NS</div>
+      </div>
+
+      <!-- Nama digabung satu baris -->
+      <div class="credit-names">
+        <b>Masrifah</b> · <b>Iqbal Limatahu</b> · <b>Nurfatimah Sugrah</b>
+      </div>
+
+      <div class="copyright">© 2026 MyFisika · All rights reserved</div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   SPLASH SCREEN → DASHBOARD
+   ============================================================ */
+
+const DASHBOARD_URL = 'dashboard.html';   // <-- ganti kalau nama file beda
+const AUTO_REDIRECT = true;               // otomatis pindah?
+const AUTO_DELAY    = 5000;               // jeda otomatis (ms) — 5 detik
+
+const splashEl  = document.getElementById('splash');
+const loadText  = document.getElementById('loadText');
+
+/* --- Ganti teks loading bertahap biar hidup --- */
+const loadingSteps = [
+  'Menyiapkan aplikasi…',
+  'Memuat materi listrik…',
+  'Menyiapkan simulasi 3D…',
+  'Hampir siap…'
+];
+let stepIdx = 0;
+const stepTimer = setInterval(() => {
+  stepIdx++;
+  if (stepIdx >= loadingSteps.length) {
+    clearInterval(stepTimer);
+    return;
+  }
+  loadText.textContent = loadingSteps[stepIdx];
+}, 1200);
+
+/* --- Fungsi pindah ke dashboard --- */
+let redirecting = false;
+function goToDashboard(){
+  if (redirecting) return;
+  redirecting = true;
+  clearInterval(stepTimer);
+  splashEl.classList.add('leaving');
+  setTimeout(() => {
+    window.location.href = DASHBOARD_URL;
+  }, 480);
+}
+
+/* --- Auto redirect --- */
+if (AUTO_REDIRECT) {
+  setTimeout(goToDashboard, AUTO_DELAY);
+}
+
+/* --- Tap di mana saja = skip lebih cepat --- */
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.credits')) return;
+  goToDashboard();
+}, { once:false });
+</script>
+
+</body>
+</html>

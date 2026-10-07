@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>AR Praktikum Elektronika — Hukum Ohm</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/",
+    "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+  }
+}
+</script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; overflow: hidden; background: #0b0f14;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+/* MindAR mengatur sendiri posisi video & canvas di dalam container */
+#container { position: fixed; inset: 0; display: none; background: #000; overflow: hidden; }
+#container.mode-3d canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+
+#overlay {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 22px; padding: 32px; text-align: center; color: #e7f6f8;
+  background: radial-gradient(circle at 50% 30%, #10241f 0%, #0b0f14 70%);
+}
+#overlay h1 {
+  font-size: 40px; font-weight: 700; line-height: 1.2;
+  background: linear-gradient(135deg, #34d399, #22d3ee, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+#overlay p.sub { font-size: 14px; color: #7f9aa3; max-width: 360px; line-height: 1.6; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+#startBtn, #demoBtn {
+  padding: 14px 32px; font-size: 16px; font-weight: 600; border: none;
+  border-radius: 999px; cursor: pointer; transition: transform .15s, box-shadow .2s;
+}
+#startBtn { background: linear-gradient(135deg, #34d399, #0891b2); color: #04211c; }
+#startBtn:hover { box-shadow: 0 0 32px 4px rgba(52,211,153,.35); }
+#demoBtn { background: rgba(255,255,255,.08); color: #d6faff; border: 1px solid rgba(255,255,255,.2); }
+#demoBtn:hover { background: rgba(255,255,255,.15); }
+.btn-row button:active { transform: scale(.96); }
+.btn-row button:disabled { opacity: .5; }
+#statusMsg {
+  font-size: 12.5px; color: #8fa5ab; min-height: 34px; line-height: 1.5;
+  position: absolute; bottom: 24px; left: 0; right: 0; padding: 0 24px; pointer-events: none;
+}
+#statusMsg.error { color: #ff9a8a; }
+
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: none;
+  align-items: center; justify-content: space-between; padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(0,0,0,.65), transparent); pointer-events: none;
+}
+#hud .left { display: flex; align-items: center; gap: 10px; }
+#hud span { color: #fff; font-size: 13px; opacity: .9; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+#modeBadge {
+  font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+  background: rgba(52,211,153,.2); border: 1px solid rgba(52,211,153,.5); color: #a7f3d0;
+}
+#modeBadge.mode-3d { background: rgba(167,139,250,.2); border-color: rgba(167,139,250,.55); color: #ddd6fe; }
+#stopBtn {
+  pointer-events: auto; padding: 8px 18px; font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px);
+}
+
+/* ───── Panel kontrol Hukum Ohm ───── */
+#panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: none;
+  flex-direction: column; gap: 8px; padding: 14px 14px 16px;
+  background: linear-gradient(0deg, rgba(3,10,14,.94) 55%, rgba(3,10,14,0));
+  pointer-events: none; align-items: center;
+}
+#panel > * { pointer-events: auto; width: 100%; max-width: 460px; }
+
+#readout {
+  display: flex; align-items: stretch; justify-content: center; gap: 6px;
+  color: #e7f6f8;
+}
+#readout .cell {
+  flex: 1; text-align: center; padding: 7px 4px 6px; border-radius: 12px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(8px);
+}
+#readout .cell small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: #93a7ad; }
+#readout .cell b { display: block; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+#readout .cell i { display: block; font-style: normal; font-size: 10.5px; color: #7f9aa3; }
+#readout .cell.v b { color: #fde68a; }
+#readout .cell.i b { color: #6ff2ff; }
+#readout .cell.r b { color: #fdba74; }
+#readout .op { align-self: center; font-size: 20px; font-weight: 700; color: #7f9aa3; }
+
+#calc { text-align: center; font-size: 12.5px; color: #cfe9ee; font-variant-numeric: tabular-nums; }
+#calc b { color: #6ff2ff; }
+
+.ctrl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ctrl label {
+  display: block; padding: 7px 10px 6px; border-radius: 12px; font-size: 12px; font-weight: 700;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); color: #d6e6ea;
+  backdrop-filter: blur(8px);
+}
+.ctrl label span { float: right; font-variant-numeric: tabular-nums; }
+.ctrl label.v span { color: #fde68a; }
+.ctrl label.r span { color: #fdba74; }
+.ctrl input[type=range] { width: 100%; margin-top: 6px; height: 26px; }
+.ctrl label.v input { accent-color: #facc15; }
+.ctrl label.r input { accent-color: #fb923c; }
+
+.row { display: flex; gap: 8px; }
+.sw {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 6px; font-size: 12.5px; font-weight: 700; font-family: inherit;
+  background: rgba(255,255,255,.07); color: #93a7ad;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 14px;
+  cursor: pointer; backdrop-filter: blur(8px); transition: all .2s;
+}
+.sw .dot { width: 9px; height: 9px; border-radius: 50%; background: #46555a; transition: all .2s; }
+.sw.on { background: rgba(52,211,153,.16); border-color: rgba(52,211,153,.55); color: #d6fff2; }
+.sw.on .dot { background: #34d399; box-shadow: 0 0 10px 2px rgba(52,211,153,.75); }
+.sw.main.on { background: rgba(250,204,21,.16); border-color: rgba(250,204,21,.55); color: #fff7d6; }
+.sw.main.on .dot { background: #facc15; box-shadow: 0 0 10px 2px rgba(250,204,21,.75); }
+.sw:active { transform: scale(.97); }
+#info { text-align: center; font-size: 11.5px; line-height: 1.5; color: #7fd8c4; padding: 0 6px; min-height: 34px; }
+
+#tableBox {
+  display: none; max-height: 24vh; overflow-y: auto; border-radius: 12px; padding: 6px 8px 8px;
+  background: rgba(3,10,14,.85); border: 1px solid rgba(255,255,255,.14); color: #d6e6ea;
+}
+#tableBox table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+#tableBox th { font-weight: 700; color: #93a7ad; padding: 3px 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,.14); }
+#tableBox td { padding: 3px 4px; text-align: center; }
+#tableBox td.eq { color: #6ff2ff; font-weight: 700; }
+#tableBox .empty { text-align: center; font-size: 11.5px; color: #7f9aa3; padding: 8px 4px 2px; }
+#tableBox .foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 6px; font-size: 11px; color: #7f9aa3; }
+#clearBtn {
+  background: none; border: 1px solid rgba(255,255,255,.2); color: #cfe9ee; border-radius: 999px;
+  padding: 4px 12px; font-size: 11px; cursor: pointer; font-family: inherit;
+}
+
+@media (max-width: 480px) {
+  #overlay h1 { font-size: 28px; }
+  #startBtn, #demoBtn { padding: 12px 24px; font-size: 15px; }
+  .sw { font-size: 12px; padding: 10px 4px; }
+  #readout .cell b { font-size: 21px; }
+}
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <h1>AR Praktikum Elektronika</h1>
+  <p class="sub">Hukum Ohm — ubah tegangan dan hambatan, baca amperemeter &amp; voltmeter, lalu buktikan V = I × R.</p>
+  <div class="btn-row">
+    <button id="startBtn">Mulai AR</button>
+    <button id="demoBtn">Mode 3D</button>
+  </div>
+  <p id="statusMsg"></p>
+</div>
+
+<div id="hud">
+  <div class="left">
+    <span id="modeBadge">AR</span>
+    <span id="hudText">Arahkan kamera ke gambar target…</span>
+  </div>
+  <button id="stopBtn">Stop</button>
+</div>
+
+<div id="panel">
+  <div id="readout">
+    <div class="cell v"><small>V</small><b id="rV">6,0</b><i>volt</i></div>
+    <span class="op">=</span>
+    <div class="cell i"><small>I</small><b id="rI">0,00</b><i>ampere</i></div>
+    <span class="op">×</span>
+    <div class="cell r"><small>R</small><b id="rR">20</b><i>ohm</i></div>
+  </div>
+  <div id="calc"></div>
+  <div class="ctrl">
+    <label class="v">Tegangan (V) <span id="vOut">6,0 V</span>
+      <input type="range" id="vSlider" min="1" max="6" step="1" value="4" />
+    </label>
+    <label class="r">Hambatan (R) <span id="rOut">20 Ω</span>
+      <input type="range" id="rSlider" min="10" max="50" step="5" value="20" />
+    </label>
+  </div>
+  <div class="row">
+    <button class="sw main" id="mainBtn"><span class="dot"></span>SAKLAR</button>
+    <button class="sw" id="logBtn">+ Catat Data</button>
+    <button class="sw" id="tblBtn">Tabel</button>
+  </div>
+  <div id="info"></div>
+  <div id="tableBox">
+    <table>
+      <thead><tr><th>No</th><th>V (volt)</th><th>R (Ω)</th><th>I (A)</th><th>V ÷ I (Ω)</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="tblEmpty">Belum ada data. Tutup saklar, lalu ketuk “+ Catat Data”.</div>
+    <div class="foot"><span>Perhatikan: V ÷ I selalu sama dengan R.</span><button id="clearBtn">Hapus</button></div>
+  </div>
+</div>
+
+<div id="container"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from 'mindar-image-three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ───────── KONFIGURASI ─────────
+const IMAGE_TARGET_SRC = 'targets/bumi.mind';
+const AR_SCALE = 0.6;   // ukuran rangkaian relatif terhadap gambar target (lebar target = 1)
+
+// Rangkaian seri: baterai → saklar → amperemeter → lampu indikator → resistor → kembali ke baterai.
+// Voltmeter dipasang PARALEL pada resistor.
+const RAIL_L = -0.62, RAIL_R = 0.62, Y_BOT = -0.42, Y_TOP = 0.45;
+const BAT_X0 = -0.38, BAT_X1 = -0.08, MAIN_SW_X = 0.30;
+const SW_GAP = 0.11, LAMP_GAP = 0.10, WIRE_R = 0.016;
+const RES_X = -0.30, RES_GAP = 0.14;     // resistor
+const LAMP_X = 0.22;                     // lampu indikator
+const AM_Y = 0.0, AM_R = 0.11;           // amperemeter (di rel kanan)
+const VM_Y = 0.12, VM_R = 0.10;          // voltmeter (di bawah resistor)
+
+// Rentang percobaan
+const V_STEP = 1.5;                      // 1,5 – 9 V
+const I_MAX_LAMP = 0.9;                  // arus maksimum (9 V / 10 Ω) → lampu paling terang
+const AM_MAX = 1.0, VM_MAX = 10;         // skala penuh meter
+
+// ───────── DOM ─────────
+const $ = (id) => document.getElementById(id);
+const startBtn = $('startBtn'), demoBtn = $('demoBtn'), stopBtn = $('stopBtn');
+const overlay = $('overlay'), hud = $('hud'), hudText = $('hudText'), modeBadge = $('modeBadge');
+const panel = $('panel'), container = $('container'), statusMsg = $('statusMsg'), infoEl = $('info');
+const rV = $('rV'), rI = $('rI'), rR = $('rR'), calcEl = $('calc');
+const vSlider = $('vSlider'), rSlider = $('rSlider'), vOut = $('vOut'), rOut = $('rOut');
+const mainBtn = $('mainBtn'), logBtn = $('logBtn'), tblBtn = $('tblBtn');
+const tableBox = $('tableBox'), tbody = $('tbody'), tblEmpty = $('tblEmpty'), clearBtn = $('clearBtn');
+
+// ───────── STATE ─────────
+const state = { main: false, V: 6, R: 20 };
+const logRows = [];
+let lastChange = null;
+let mindarThree = null, mode3D = null, currentMode = null, circuit = null;
+let arRenderer = null, arScene = null, arCamera = null;
+const clock = new THREE.Clock();
+
+const clamp01 = (x) => Math.max(0, Math.min(1, x));
+const fmt = (n, d = 2) => n.toFixed(d).replace('.', ',');
+const currentI = () => (state.main ? state.V / state.R : 0);
+
+// ───────── HELPER (sama seperti rangkaian paralel) ─────────
+const wireMat = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: 0.92, roughness: 0.28 });
+const probeMat = new THREE.MeshStandardMaterial({ color: 0x7dd3fc, metalness: 0.8, roughness: 0.3 });
+
+function makeWire(x1, y1, x2, y2, r = WIRE_R, mat = wireMat) {
+  const a = new THREE.Vector3(x1, y1, 0), b = new THREE.Vector3(x2, y2, 0);
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r, r, a.distanceTo(b), 14), mat);
+  mesh.position.copy(a).lerp(b, 0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+  return mesh;
+}
+
+// Bola kecil penutup sambungan/sudut kabel supaya tidak ada celah
+const jointGeo = new THREE.SphereGeometry(WIRE_R * 1.35, 14, 14);
+function addJoint(parent, x, y, mat = wireMat) {
+  const m = new THREE.Mesh(jointGeo, mat);
+  m.position.set(x, y, 0);
+  parent.add(m);
+}
+
+function makeLabel(text, color = '#8ef7ff') {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.font = 'bold 68px -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = color; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 14;
+  ctx.fillText(text, 256, 68);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 4;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, depthTest: false, depthWrite: false,
+  }));
+  sprite.scale.set(0.30, 0.075, 1);
+  return sprite;
+}
+
+// Label yang teksnya bisa diganti (untuk nilai V dan R)
+function makeDynLabel(color = '#8ef7ff', scaleX = 0.36, fontPx = 58) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 4;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, depthTest: false, depthWrite: false,
+  }));
+  sprite.scale.set(scaleX, scaleX / 4, 1);
+  let last = null;
+  function set(text) {
+    if (text === last) return;
+    last = text;
+    ctx.clearRect(0, 0, 512, 128);
+    ctx.font = 'bold ' + fontPx + 'px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = color; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 14;
+    ctx.fillText(text, 256, 68);
+    tex.needsUpdate = true;
+  }
+  return { sprite, set };
+}
+
+// Tekstur cahaya lembut (radial) untuk halo lampu
+function makeGlowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  const gr = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0.00, 'rgba(255,240,180,1)');
+  gr.addColorStop(0.22, 'rgba(255,196,90,0.60)');
+  gr.addColorStop(0.55, 'rgba(255,150,40,0.16)');
+  gr.addColorStop(1.00, 'rgba(255,140,30,0)');
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+const glowTex = makeGlowTexture();
+
+// ───────── LAMPU (tidak diubah) ─────────
+// Terminal kiri/kanan (di x = ±LAMP_GAP) dihubungkan langsung ke dudukan lampu,
+// sehingga kabel dari rel/baterai benar-benar tersambung ke lampu.
+function createLamp(labelText) {
+  const g = new THREE.Group();
+
+  // Terminal + kabel penghubung ke dudukan
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffc107, metalness: 0.9, roughness: 0.25 });
+  const postGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.05, 14);
+  const p1 = new THREE.Mesh(postGeo, postMat); p1.position.set(-LAMP_GAP, 0.02, 0);
+  const p2 = new THREE.Mesh(postGeo, postMat); p2.position.set(LAMP_GAP, 0.02, 0);
+  g.add(p1, p2);
+  g.add(makeWire(-LAMP_GAP, 0, -0.045, 0));
+  g.add(makeWire(0.045, 0, LAMP_GAP, 0));
+
+  // Badan lampu (sedikit diperkecil)
+  const body = new THREE.Group();
+  body.scale.setScalar(0.9);
+  g.add(body);
+
+  // Dudukan ulir (screw base)
+  const metal = new THREE.MeshStandardMaterial({ color: 0xc4ccd2, metalness: 0.95, roughness: 0.3 });
+  const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.046, 0.07, 28), metal);
+  sleeve.position.y = 0.005; body.add(sleeve);
+  const ringGeo = new THREE.TorusGeometry(0.047, 0.005, 8, 28);
+  [-0.015, 0.0, 0.015, 0.03].forEach((y) => {
+    const ring = new THREE.Mesh(ringGeo, metal);
+    ring.rotation.x = Math.PI / 2; ring.position.y = y; body.add(ring);
+  });
+  const collar = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.05, 0.05, 0.012, 28),
+    new THREE.MeshStandardMaterial({ color: 0x2b2f33, roughness: 0.6, metalness: 0.3 })
+  );
+  collar.position.y = 0.046; body.add(collar);
+  const insul = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.038, 0.038, 0.01, 20),
+    new THREE.MeshStandardMaterial({ color: 0x1a1d20, roughness: 0.7 })
+  );
+  insul.position.y = -0.033; body.add(insul);
+  const contact = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.018, 0.018, 0.01, 16),
+    new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: 0.95, roughness: 0.25 })
+  );
+  contact.position.y = -0.041; body.add(contact);
+
+  // Bohlam kaca (profil klasik, dibuat dengan Lathe)
+  const prof = new THREE.SplineCurve([
+    new THREE.Vector2(0.034, 0.052), new THREE.Vector2(0.036, 0.070),
+    new THREE.Vector2(0.046, 0.092), new THREE.Vector2(0.063, 0.112),
+    new THREE.Vector2(0.078, 0.132), new THREE.Vector2(0.084, 0.155),
+    new THREE.Vector2(0.080, 0.178), new THREE.Vector2(0.068, 0.200),
+    new THREE.Vector2(0.048, 0.220), new THREE.Vector2(0.024, 0.233),
+    new THREE.Vector2(0.000, 0.237),
+  ]).getPoints(48);
+  const bulbMat = new THREE.MeshStandardMaterial({
+    color: 0xe6f4ff, emissive: 0xffb347, emissiveIntensity: 0,
+    transparent: true, opacity: 0.28, roughness: 0.04, metalness: 0.05,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const bulb = new THREE.Mesh(new THREE.LatheGeometry(prof, 36), bulbMat);
+  body.add(bulb);
+
+  // Tiang kaca + penyangga filamen
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.008, 0.011, 0.055, 12),
+    new THREE.MeshStandardMaterial({ color: 0xcfe3ee, transparent: true, opacity: 0.55, roughness: 0.2 })
+  );
+  stem.position.y = 0.0775; body.add(stem);
+  body.add(makeWire(-0.005, 0.098, -0.022, 0.150, 0.0035));
+  body.add(makeWire(0.005, 0.098, 0.022, 0.150, 0.0035));
+
+  // Filamen berbentuk koil
+  const pts = [];
+  const N = 90, turns = 7;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N, a = t * Math.PI * 2 * turns;
+    pts.push(new THREE.Vector3(-0.022 + 0.044 * t, 0.150 + 0.008 * Math.sin(a), 0.008 * Math.cos(a)));
+  }
+  const filOff = new THREE.Color(0x6a5a48), filOn = new THREE.Color(0xfff2b8);
+  const filMat = new THREE.MeshStandardMaterial({
+    color: filOff.clone(), emissive: 0xff9a1a, emissiveIntensity: 0, metalness: 0.6, roughness: 0.4,
+  });
+  const filament = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.0035, 6, false), filMat
+  );
+  body.add(filament);
+
+  // Inti cahaya (menyala di dalam bohlam)
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.05, 20, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xffe08a, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    })
+  );
+  core.position.y = 0.150; body.add(core);
+
+  // Halo cahaya
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTex, transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  halo.position.y = 0.150; halo.scale.set(0.45, 0.45, 1); body.add(halo);
+
+  const light = new THREE.PointLight(0xffcc55, 0, 1.8, 1.4);
+  light.position.y = 0.150; body.add(light);
+
+  const lbl = makeLabel(labelText, '#9ef7ff');
+  lbl.position.set(0, -0.17, 0); body.add(lbl);
+
+  g.userData = { bulbMat, filMat, filOff, filOn, core, halo, light };
+  return g;
+}
+
+// ───────── SAKLAR (tidak diubah) ─────────
+function createSwitch(labelText, swId) {
+  const g = new THREE.Group();
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffc107, metalness: 0.9, roughness: 0.25 });
+  const postGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.05, 14);
+  const p1 = new THREE.Mesh(postGeo, postMat); p1.position.set(-SW_GAP, 0.02, 0);
+  const p2 = new THREE.Mesh(postGeo, postMat); p2.position.set(SW_GAP, 0.02, 0);
+  g.add(p1, p2);
+
+  const lever = new THREE.Group();
+  const armMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.55, roughness: 0.4 });
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(SW_GAP * 2, 0.03, 0.03), armMat);
+  arm.position.x = SW_GAP; lever.add(arm);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 16), armMat);
+  knob.position.x = SW_GAP * 2; lever.add(knob);
+  lever.position.set(-SW_GAP, 0.038, 0);
+  g.add(lever);
+
+  const hit = new THREE.Mesh(
+    new THREE.BoxGeometry(SW_GAP * 2 + 0.24, 0.24, 0.24),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+  );
+  hit.position.set(0, 0.04, 0); g.add(hit);
+
+  const lbl = makeLabel(labelText, '#ffd166');
+  lbl.position.set(0, 0.16, 0); g.add(lbl);
+
+  g.userData = { lever, swId };
+  g.traverse((o) => { o.userData.swId = swId; });
+  return g;
+}
+
+// ───────── KOMPONEN BARU: RESISTOR ─────────
+// Gelang warna mengikuti nilai R yang dipilih (2 digit + pengali ×1).
+const BAND_COLORS = [0x111111, 0x7a3b12, 0xd32f2f, 0xf57c00, 0xfdd835, 0x388e3c, 0x1976d2, 0x7b1fa2, 0x757575, 0xf5f5f5];
+
+function createResistor() {
+  const g = new THREE.Group();
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffc107, metalness: 0.9, roughness: 0.25 });
+  const postGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.05, 14);
+  const p1 = new THREE.Mesh(postGeo, postMat); p1.position.set(-RES_GAP, 0.02, 0);
+  const p2 = new THREE.Mesh(postGeo, postMat); p2.position.set(RES_GAP, 0.02, 0);
+  g.add(p1, p2);
+  g.add(makeWire(-RES_GAP, 0, -0.085, 0));
+  g.add(makeWire(0.085, 0, RES_GAP, 0));
+
+  const ceramic = new THREE.MeshStandardMaterial({ color: 0xd9c79c, roughness: 0.6, metalness: 0.05 });
+  const bodyM = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.12, 28), ceramic);
+  bodyM.rotation.z = Math.PI / 2; g.add(bodyM);
+  [-0.06, 0.06].forEach((x) => {
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.052, 20, 14), ceramic);
+    cap.scale.set(0.55, 1, 1); cap.position.x = x; g.add(cap);
+  });
+
+  const bandGeo = new THREE.CylinderGeometry(0.0535, 0.0535, 0.011, 28);
+  const bands = [-0.050, -0.026, -0.002].map((x) => {
+    const m = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+    const b = new THREE.Mesh(bandGeo, m);
+    b.rotation.z = Math.PI / 2; b.position.x = x; g.add(b);
+    return m;
+  });
+  const tol = new THREE.Mesh(bandGeo, new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.3 }));
+  tol.rotation.z = Math.PI / 2; tol.position.x = 0.050; g.add(tol);
+
+  const lblName = makeLabel('RESISTOR', '#fdba74');
+  lblName.position.set(0, 0.17, 0); g.add(lblName);
+  const lblVal = makeDynLabel('#ffd9a8', 0.26, 60);
+  lblVal.sprite.position.set(0, -0.13, 0); g.add(lblVal.sprite);
+
+  function setR(R) {
+    const d1 = Math.floor(R / 10) % 10, d2 = R % 10;
+    bands[0].color.setHex(BAND_COLORS[d1]);
+    bands[1].color.setHex(BAND_COLORS[d2]);
+    bands[2].color.setHex(BAND_COLORS[0]);          // pengali ×10⁰
+    lblVal.set(R + ' Ω');
+  }
+  g.userData = { setR };
+  return g;
+}
+
+// ───────── KOMPONEN BARU: METER (amperemeter / voltmeter) ─────────
+const METER_SWEEP = 50;    // derajat kiri-kanan dari vertikal
+const FACE_PX = 256, PIVOT_Y_PX = 170;
+
+function makeMeterFace(letter, max, accent) {
+  const c = document.createElement('canvas');
+  c.width = c.height = FACE_PX;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#f5f0e1';
+  ctx.beginPath(); ctx.arc(128, 128, 128, 0, Math.PI * 2); ctx.fill();
+
+  const cx = 128, cy = PIVOT_Y_PX;
+  ctx.strokeStyle = '#222'; ctx.fillStyle = '#222';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 100, (-90 - METER_SWEEP) * Math.PI / 180, (-90 + METER_SWEEP) * Math.PI / 180);
+  ctx.stroke();
+
+  for (let i = 0; i <= 20; i++) {
+    const a = (-METER_SWEEP + (2 * METER_SWEEP * i) / 20) * Math.PI / 180;
+    const major = i % 5 === 0;
+    const r1 = 100, r2 = major ? 80 : 90;
+    ctx.lineWidth = major ? 4 : 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + r1 * Math.sin(a), cy - r1 * Math.cos(a));
+    ctx.lineTo(cx + r2 * Math.sin(a), cy - r2 * Math.cos(a));
+    ctx.stroke();
+    if (major) {
+      ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const val = (max * i) / 20;
+      const txt = Number.isInteger(val) ? String(val) : val.toFixed(2).replace('.', ',');
+      ctx.fillText(txt, cx + 62 * Math.sin(a), cy - 62 * Math.cos(a));
+    }
+  }
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 54px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(letter, 128, 214);
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function createMeter(letter, max, accentHex, radius) {
+  const g = new THREE.Group();
+  const bezel = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius * 1.1, radius * 1.1, 0.04, 36),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.7, roughness: 0.35 })
+  );
+  bezel.rotation.x = Math.PI / 2; g.add(bezel);
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 1.08, 0.008, 10, 40),
+    new THREE.MeshStandardMaterial({ color: 0xc4ccd2, metalness: 0.95, roughness: 0.3 })
+  );
+  ring.position.z = 0.02; g.add(ring);
+
+  const face = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 40),
+    new THREE.MeshBasicMaterial({ map: makeMeterFace(letter, max, accentHex) })
+  );
+  face.position.z = 0.0205; g.add(face);
+
+  const k = radius / 128;
+  const needle = new THREE.Group();
+  needle.position.set(0, -(PIVOT_Y_PX - 128) * k, 0.03);
+  const len = 88 * k;
+  const nMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.005, len, 0.004),
+    new THREE.MeshBasicMaterial({ color: 0xd32f2f })
+  );
+  nMesh.position.y = len / 2; needle.add(nMesh);
+  const hub = new THREE.Mesh(new THREE.SphereGeometry(0.012, 14, 14), new THREE.MeshBasicMaterial({ color: 0x222222 }));
+  needle.add(hub);
+  g.add(needle);
+
+  function setValue(v) {
+    const a = (-METER_SWEEP + 2 * METER_SWEEP * clamp01(v / max)) * Math.PI / 180;
+    needle.rotation.z = -a;
+  }
+  setValue(0);
+  g.userData = { setValue };
+  return g;
+}
+
+// ───────── PATH ELEKTRON ─────────
+// Elektron keluar dari kutub negatif baterai (kiri), naik lewat rel kiri,
+// melewati resistor & lampu, turun lewat rel kanan (amperemeter), lalu kembali lewat saklar ke kutub positif.
+function makeLoopPath() {
+  const pts = [
+    [BAT_X0, Y_BOT], [RAIL_L, Y_BOT], [RAIL_L, Y_TOP], [RAIL_R, Y_TOP],
+    [RAIL_R, Y_BOT], [MAIN_SW_X, Y_BOT], [BAT_X1, Y_BOT],
+  ].map((p) => new THREE.Vector3(p[0], p[1], 0));
+  const segs = []; let total = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length], len = a.distanceTo(b);
+    segs.push({ a, b, len, start: total }); total += len;
+  }
+  return { segs, total };
+}
+
+const _tmpV = new THREE.Vector3();
+function pointAt(path, s) {
+  s = ((s % path.total) + path.total) % path.total;
+  for (const seg of path.segs) {
+    if (s <= seg.start + seg.len) return _tmpV.copy(seg.a).lerp(seg.b, (s - seg.start) / seg.len);
+  }
+  return _tmpV.copy(path.segs[path.segs.length - 1].b);
+}
+
+// ───────── BUILD RANGKAIAN ─────────
+function buildCircuit(parent) {
+  const root = new THREE.Group();
+  parent.add(root);
+
+  const board = new THREE.Mesh(
+    new THREE.BoxGeometry(1.62, 1.36, 0.05),
+    new THREE.MeshStandardMaterial({ color: 0x0f3b30, roughness: 0.75, metalness: 0.15 })
+  );
+  board.position.set(0, 0.06, -0.07); root.add(board);
+
+  // Rel kiri (baterai − → resistor) & rel kanan (lampu → amperemeter → saklar)
+  root.add(makeWire(RAIL_L, Y_BOT, RAIL_L, Y_TOP));
+  root.add(makeWire(RAIL_R, Y_BOT, RAIL_R, AM_Y - AM_R));
+  root.add(makeWire(RAIL_R, AM_Y + AM_R, RAIL_R, Y_TOP));
+  // Baterai → rel kiri, saklar utama → rel kanan
+  root.add(makeWire(RAIL_L, Y_BOT, BAT_X0, Y_BOT));
+  root.add(makeWire(BAT_X1, Y_BOT, MAIN_SW_X - SW_GAP, Y_BOT));
+  root.add(makeWire(MAIN_SW_X + SW_GAP, Y_BOT, RAIL_R, Y_BOT));
+  // Kabel atas: rel kiri → resistor → lampu → rel kanan
+  root.add(makeWire(RAIL_L, Y_TOP, RES_X - RES_GAP, Y_TOP));
+  root.add(makeWire(RES_X + RES_GAP, Y_TOP, LAMP_X - LAMP_GAP, Y_TOP));
+  root.add(makeWire(LAMP_X + LAMP_GAP, Y_TOP, RAIL_R, Y_TOP));
+
+  // Sambungan sudut
+  addJoint(root, RAIL_L, Y_BOT);
+  addJoint(root, RAIL_R, Y_BOT);
+  addJoint(root, RAIL_L, Y_TOP);
+  addJoint(root, RAIL_R, Y_TOP);
+
+  // ── Baterai (silinder dengan terminal + dan −) — tidak diubah ──
+  const batCx = (BAT_X0 + BAT_X1) / 2;
+  const steel = new THREE.MeshStandardMaterial({ color: 0xd5dbe0, metalness: 0.95, roughness: 0.25 });
+
+  const capNeg = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.012, 24), steel);
+  capNeg.rotation.z = Math.PI / 2; capNeg.position.set(BAT_X0 + 0.006, Y_BOT, 0); root.add(capNeg);
+
+  const bodyX0 = BAT_X0 + 0.012, bodyX1 = BAT_X1 - 0.03;
+  const batBody = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.075, 0.075, bodyX1 - bodyX0, 28),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.7 })
+  );
+  batBody.rotation.z = Math.PI / 2; batBody.position.set((bodyX0 + bodyX1) / 2, Y_BOT, 0); root.add(batBody);
+
+  const sleeve = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.0775, 0.0775, 0.19, 28),
+    new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.45, metalness: 0.35 })
+  );
+  sleeve.rotation.z = Math.PI / 2; sleeve.position.set(batCx - 0.025, Y_BOT, 0); root.add(sleeve);
+
+  const nubPos = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.03, 20), steel);
+  nubPos.rotation.z = Math.PI / 2; nubPos.position.set(BAT_X1 - 0.015, Y_BOT, 0); root.add(nubPos);
+
+  const lblPlus = makeLabel('+', '#ff8a80');
+  lblPlus.scale.set(0.14, 0.09, 1); lblPlus.position.set(BAT_X1 - 0.03, Y_BOT + 0.16, 0); root.add(lblPlus);
+  const lblMin = makeLabel('−', '#8ecbff');
+  lblMin.scale.set(0.14, 0.09, 1); lblMin.position.set(BAT_X0 + 0.03, Y_BOT + 0.16, 0); root.add(lblMin);
+  // Label baterai menampilkan tegangan yang dipilih
+  const lblBat = makeDynLabel('#c7d2fe', 0.36, 56);
+  lblBat.sprite.position.set(batCx, Y_BOT - 0.17, 0); root.add(lblBat.sprite);
+
+  // ── Saklar utama — tidak diubah ──
+  const mainSwitch = createSwitch('SAKLAR', 'main');
+  mainSwitch.position.set(MAIN_SW_X, Y_BOT, 0); root.add(mainSwitch);
+
+  // ── Resistor ──
+  const resistor = createResistor();
+  resistor.position.set(RES_X, Y_TOP, 0); root.add(resistor);
+
+  // ── Lampu indikator (seri) ──
+  const lamp = createLamp('LAMPU');
+  lamp.position.set(LAMP_X, Y_TOP, 0); root.add(lamp);
+
+  // ── Amperemeter (seri, di rel kanan) ──
+  const ammeter = createMeter('A', AM_MAX, '#c62828', AM_R);
+  ammeter.position.set(RAIL_R, AM_Y, 0); root.add(ammeter);
+  const lblAm = makeDynLabel('#ff9e9e', 0.34, 50); lblAm.set('AMPEREMETER');
+  lblAm.sprite.position.set(RAIL_R - 0.12, AM_Y - 0.17, 0); root.add(lblAm.sprite);
+
+  // ── Voltmeter (PARALEL dengan resistor) ──
+  const voltmeter = createMeter('V', VM_MAX, '#1565c0', VM_R);
+  voltmeter.position.set(RES_X, VM_Y, 0); root.add(voltmeter);
+  const xl = RES_X - RES_GAP, xr = RES_X + RES_GAP;
+  root.add(makeWire(xl, Y_TOP, xl, VM_Y, 0.012, probeMat));
+  root.add(makeWire(xl, VM_Y, RES_X - VM_R * 1.1, VM_Y, 0.012, probeMat));
+  root.add(makeWire(xr, Y_TOP, xr, VM_Y, 0.012, probeMat));
+  root.add(makeWire(xr, VM_Y, RES_X + VM_R * 1.1, VM_Y, 0.012, probeMat));
+  [[xl, Y_TOP], [xr, Y_TOP], [xl, VM_Y], [xr, VM_Y]].forEach((p) => addJoint(root, p[0], p[1], probeMat));
+  const lblVm = makeDynLabel('#9ed0ff', 0.34, 50); lblVm.set('VOLTMETER');
+  lblVm.sprite.position.set(RES_X, VM_Y - 0.17, 0); root.add(lblVm.sprite);
+
+  // ── Elektron ──
+  const electronGeo = new THREE.SphereGeometry(0.018, 10, 10);
+  const electronMat = new THREE.MeshBasicMaterial({ color: 0x6ff2ff });
+  const ELECTRON_COUNT = 14;
+  const path = makeLoopPath();
+  const electrons = [], eGroup = new THREE.Group();
+  for (let i = 0; i < ELECTRON_COUNT; i++) {
+    const e = new THREE.Mesh(electronGeo, electronMat);
+    e.userData.phase = i / ELECTRON_COUNT;
+    eGroup.add(e); electrons.push(e);
+  }
+  eGroup.visible = false; root.add(eGroup);
+
+  const starGeo = new THREE.BufferGeometry();
+  const starPos = new Float32Array(160 * 3);
+  for (let i = 0; i < starPos.length; i++) starPos[i] = (Math.random() - 0.5) * 3.2;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.006, transparent: true, opacity: 0.5, sizeAttenuation: true, depthWrite: false,
+  }));
+  stars.position.set(0, 0.1, -0.4); root.add(stars);
+
+  return {
+    root, stars, mainSwitch, mainLever: mainSwitch.userData.lever,
+    lamp, resistor, ammeter, voltmeter, lblBat,
+    path, electrons, electronGroup: eGroup,
+    glow: 0, dispI: 0, dispV: 0, flow: 0,
+    tappables: [mainSwitch],
+  };
+}
+
+// ───────── ANIMASI ─────────
+let electronClock = 0;
+
+function updateCircuit(dt) {
+  if (!circuit) return;
+  electronClock += dt;
+  const k = Math.min(1, dt * 14);
+  const c = circuit;
+
+  c.mainLever.rotation.z += ((state.main ? 0 : 0.95) - c.mainLever.rotation.z) * k;
+
+  // Pembacaan meter (jarum bergerak halus menuju nilai sebenarnya)
+  const I = currentI();
+  const Vr = I * state.R;                        // beda potensial pada resistor = I × R
+  const km = Math.min(1, dt * 7);
+  c.dispI += (I - c.dispI) * km;
+  c.dispV += (Vr - c.dispV) * km;
+  c.ammeter.userData.setValue(c.dispI);
+  c.voltmeter.userData.setValue(c.dispV);
+
+  // Lampu indikator: makin besar arus, makin terang
+  const target = state.main ? clamp01(Math.sqrt(I / I_MAX_LAMP)) : 0;
+  c.glow += (target - c.glow) * Math.min(1, dt * 8);
+  const ud = c.lamp.userData;
+  const pulse = 1 + 0.035 * Math.sin(electronClock * 9);
+
+  ud.bulbMat.emissiveIntensity = c.glow * 1.6;
+  ud.bulbMat.opacity = 0.28 + c.glow * 0.40;
+  ud.filMat.emissiveIntensity = c.glow * 3.5;
+  ud.filMat.color.copy(ud.filOff).lerp(ud.filOn, c.glow);
+  ud.core.material.opacity = c.glow * 0.55;
+  ud.halo.visible = c.glow > 0.01;
+  ud.halo.material.opacity = c.glow * 0.95;
+  ud.halo.scale.set(0.45 * pulse * (0.8 + 0.2 * c.glow), 0.45 * pulse * (0.8 + 0.2 * c.glow), 1);
+  ud.light.intensity = c.glow * 1.1 * pulse;
+
+  // Aliran elektron: kecepatan sebanding dengan arus I
+  c.electronGroup.visible = state.main;
+  if (state.main) {
+    c.flow += dt * (0.12 + I * 1.5);
+    c.electrons.forEach((e) => {
+      e.position.copy(pointAt(c.path, c.flow + e.userData.phase * c.path.total));
+    });
+  }
+
+  if (c.stars) c.stars.rotation.z += dt * 0.02;
+}
+
+// ───────── UI ─────────
+function describe() {
+  const I = currentI();
+  if (!state.main) return 'Saklar terbuka — rangkaian belum tertutup sehingga I = 0 A. Ketuk SAKLAR (di panel atau di model 3D).';
+  if (lastChange === 'V') return 'V dinaikkan/diturunkan, R tetap → arus I berubah searah V (I ∝ V). Lihat jarum amperemeter & terang lampu.';
+  if (lastChange === 'R') return 'R diubah, V tetap → arus I berubah berlawanan dengan R (I ∝ 1/R). Hambatan besar = arus kecil.';
+  return 'Voltmeter terpasang paralel pada resistor, amperemeter seri. Geser V atau R lalu amati V = I × R. Lampu = indikator (hambatan diabaikan).';
+}
+
+function syncUI() {
+  const I = currentI();
+  rV.textContent = fmt(state.V, 1);
+  rR.textContent = String(state.R);
+  rI.textContent = fmt(I, 2);
+  vOut.textContent = fmt(state.V, 1) + ' V';
+  rOut.textContent = state.R + ' Ω';
+  calcEl.innerHTML = state.main
+    ? 'I = V ÷ R = ' + fmt(state.V, 1) + ' ÷ ' + state.R + ' = <b>' + fmt(I, 2) + ' A</b>'
+    : 'I = V ÷ R = ' + fmt(state.V, 1) + ' ÷ ' + state.R + ' — saklar terbuka, <b>I = 0 A</b>';
+  mainBtn.classList.toggle('on', state.main);
+  logBtn.style.opacity = state.main ? '1' : '.5';
+  infoEl.textContent = describe();
+  if (circuit) {
+    circuit.resistor.userData.setR(state.R);
+    circuit.lblBat.set('BATERAI ' + fmt(state.V, 1) + ' V');
+  }
+}
+
+function refitView() { if (currentMode === '3d' && mode3D && mode3D.fitView) mode3D.fitView(false); }
+function toggleMain() { state.main = !state.main; syncUI(); }
+function toggle(id) { if (id === 'main') toggleMain(); }
+
+function renderTable() {
+  tbody.innerHTML = '';
+  logRows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + fmt(r.V, 1) + '</td><td>' + r.R +
+      '</td><td>' + fmt(r.I, 3) + '</td><td class="eq">' + fmt(r.V / r.I, 1) + '</td>';
+    tbody.appendChild(tr);
+  });
+  tblEmpty.style.display = logRows.length ? 'none' : 'block';
+}
+
+vSlider.addEventListener('input', () => {
+  const v = Number(vSlider.value) * V_STEP;
+  if (v !== state.V) { state.V = v; lastChange = 'V'; syncUI(); }
+});
+rSlider.addEventListener('input', () => {
+  const r = Number(rSlider.value);
+  if (r !== state.R) { state.R = r; lastChange = 'R'; syncUI(); }
+});
+mainBtn.addEventListener('click', toggleMain);
+logBtn.addEventListener('click', () => {
+  if (!state.main) {
+    infoEl.textContent = 'Tutup saklar dulu — data hanya bisa dicatat saat ada arus.';
+    return;
+  }
+  logRows.push({ V: state.V, R: state.R, I: state.V / state.R });
+  if (logRows.length > 20) logRows.shift();
+  renderTable();
+  tableBox.style.display = 'block';
+  tableBox.scrollTop = tableBox.scrollHeight;
+  refitView();
+});
+tblBtn.addEventListener('click', () => {
+  tableBox.style.display = tableBox.style.display === 'block' ? 'none' : 'block';
+  refitView();
+});
+clearBtn.addEventListener('click', () => { logRows.length = 0; renderTable(); refitView(); });
+
+// Tap saklar 3D
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+function onPointerDown(e) {
+  if (!circuit) return;
+  if (e.target.closest && e.target.closest('#panel, #hud, #overlay')) return;
+
+  let renderer, camera;
+  if (currentMode === 'ar') { renderer = arRenderer; camera = arCamera; }
+  else if (currentMode === '3d' && mode3D) { renderer = mode3D.renderer; camera = mode3D.camera; }
+  if (!renderer || !camera) return;
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+  pointer.set((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(circuit.tappables, true);
+  if (hits.length) {
+    const id = hits[0].object.userData.swId;
+    if (id) toggle(id);
+  }
+}
+
+// ───────── CEK FILE .MIND ─────────
+async function mindFileExists() {
+  try {
+    let res = await fetch(IMAGE_TARGET_SRC, { method: 'HEAD', cache: 'no-store' });
+    if (res.status === 405 || res.status === 501) res = await fetch(IMAGE_TARGET_SRC, { cache: 'no-store' });
+    return res.ok;
+  } catch { return false; }
+}
+
+function addLights(scene) {
+  scene.add(new THREE.HemisphereLight(0xbfe9ff, 0x203030, 1.5));
+  const d = new THREE.DirectionalLight(0xffffff, 1.5); d.position.set(0.8, 1.6, 1.2); scene.add(d);
+  const f = new THREE.DirectionalLight(0xaaccff, 0.7); f.position.set(-1, 0.6, 0.8); scene.add(f);
+  const r = new THREE.DirectionalLight(0x66ffcc, 0.5); r.position.set(0, -1, 0.6); scene.add(r);
+}
+
+// ───────── START AR ─────────
+async function startAR() {
+  startBtn.disabled = true; demoBtn.disabled = true;
+  statusMsg.classList.remove('error');
+  statusMsg.textContent = 'Menyiapkan AR...';
+
+  if (!(await mindFileExists())) {
+    console.warn('[AR] File .mind tidak ditemukan:', IMAGE_TARGET_SRC);
+    statusMsg.classList.add('error');
+    statusMsg.textContent = 'File ' + IMAGE_TARGET_SRC + ' tidak ditemukan. Beralih ke Mode 3D…';
+    setTimeout(() => start3DMode('Mode 3D — file target AR belum tersedia.'), 900);
+    return;
+  }
+
+  try {
+    statusMsg.textContent = 'Meminta izin kamera...';
+
+    // PENTING: container harus terlihat SEBELUM MindAR dibuat,
+    // supaya ukuran renderer & proyeksi kamera dihitung benar.
+    container.innerHTML = '';
+    container.className = 'mode-ar';
+    container.style.display = 'block';
+
+    mindarThree = new MindARThree({ container, imageTargetSrc: IMAGE_TARGET_SRC });
+    arRenderer = mindarThree.renderer;
+    arScene = mindarThree.scene;
+    arCamera = mindarThree.camera;
+
+    addLights(arScene);
+
+    const anchor = mindarThree.addAnchor(0);
+    circuit = buildCircuit(anchor.group);
+    circuit.root.scale.setScalar(AR_SCALE);
+
+    anchor.onTargetFound = () => { hudText.textContent = 'Target terdeteksi ✓ — atur V & R, ketuk saklar'; };
+    anchor.onTargetLost = () => { hudText.textContent = 'Arahkan kamera ke gambar target…'; };
+
+    await mindarThree.start();
+    currentMode = 'ar';
+
+    overlay.style.display = 'none';
+    hud.style.display = 'flex';
+    panel.style.display = 'flex';
+    modeBadge.textContent = 'AR';
+    modeBadge.classList.remove('mode-3d');
+    hudText.textContent = 'Arahkan kamera ke gambar target…';
+    syncUI();
+
+    window.addEventListener('pointerdown', onPointerDown);
+
+    clock.start();
+    arRenderer.setAnimationLoop(() => {
+      updateCircuit(Math.min(clock.getDelta(), 0.05));
+      arRenderer.render(arScene, arCamera);
+    });
+    statusMsg.textContent = '';
+  } catch (err) {
+    console.error('[AR] Gagal:', err);
+    try {
+      if (mindarThree && mindarThree.renderer) mindarThree.renderer.setAnimationLoop(null);
+      if (mindarThree && mindarThree.stop) await mindarThree.stop();
+    } catch (_) {}
+    mindarThree = null; arRenderer = null; arScene = null; arCamera = null; circuit = null;
+    container.style.display = 'none';
+    container.innerHTML = '';
+    start3DMode('AR tidak dapat dimulai (kamera/target bermasalah). Mode 3D aktif.');
+  }
+}
+
+// ───────── MODE 3D ─────────
+function start3DMode(note = '') {
+  container.innerHTML = '';
+  container.className = 'mode-3d';
+  container.style.display = 'block';
+
+  const w = window.innerWidth, h = window.innerHeight;
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h);
+  if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0b0f14);
+  const grid = new THREE.GridHelper(4, 40, 0x1f3b34, 0x142822);
+  grid.position.y = -0.75; scene.add(grid);
+
+  const camera = new THREE.PerspectiveCamera(48, w / h, 0.1, 100);
+  camera.position.set(0.05, 0.55, 1.85);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0.03, 0);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 0.8; controls.maxDistance = 6;
+  controls.panSpeed = 0.6;
+
+  addLights(scene);
+  circuit = buildCircuit(scene);
+
+  const mode = { renderer, scene, camera, controls, animId: 0, onResize: null };
+  const c3 = new THREE.Clock();
+  (function loop() {
+    mode.animId = requestAnimationFrame(loop);
+    updateCircuit(Math.min(c3.getDelta(), 0.05));
+    controls.update();
+    renderer.render(scene, camera);
+  })();
+
+  // Panel kontrol menutupi bagian bawah layar: geser tampilan ke atas supaya rangkaian
+  // tetap utuh di area yang terlihat, dan jauhkan kamera bila layar sempit (HP portrait).
+  const tanHalf = Math.tan((48 / 2) * Math.PI / 180);
+  mode.fitView = (resetDistance) => {
+    const W = window.innerWidth, H = window.innerHeight;
+    const panelH = panel.style.display === 'none' ? 0 : panel.offsetHeight;
+    camera.aspect = W / H;
+    camera.setViewOffset(W, H, 0, panelH / 2, W, H);
+    if (resetDistance) {
+      const visFrac = Math.max(0.35, (H - panelH) / H);
+      const dW = 1.78 / (2 * tanHalf * camera.aspect);
+      const dH = 1.75 / (2 * tanHalf * visFrac);
+      const d = Math.max(1.92, dW, dH);
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      camera.position.copy(controls.target).addScaledVector(dir, d);
+    }
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  };
+  mode.onResize = () => mode.fitView(false);
+  window.addEventListener('resize', mode.onResize);
+  mode3D = mode;
+  currentMode = '3d';
+
+  overlay.style.display = 'none';
+  hud.style.display = 'flex';
+  panel.style.display = 'flex';
+  modeBadge.textContent = '3D';
+  modeBadge.classList.add('mode-3d');
+  hudText.textContent = 'Geser = putar · Cubit/scroll = zoom · Ketuk saklar = nyala/mati';
+  syncUI();
+  mode.fitView(true);
+
+  window.addEventListener('pointerdown', onPointerDown);
+  statusMsg.classList.remove('error');
+  statusMsg.textContent = note || '';
+  startBtn.disabled = false; demoBtn.disabled = false;
+}
+
+// ───────── STOP ─────────
+async function stopAR() {
+  window.removeEventListener('pointerdown', onPointerDown);
+
+  if (currentMode === 'ar' && mindarThree) {
+    try {
+      if (mindarThree.renderer) mindarThree.renderer.setAnimationLoop(null);
+      if (mindarThree.stop) await mindarThree.stop();
+    } catch (_) {}
+    mindarThree = null; arRenderer = null; arScene = null; arCamera = null;
+  } else if (currentMode === '3d' && mode3D) {
+    cancelAnimationFrame(mode3D.animId);
+    window.removeEventListener('resize', mode3D.onResize);
+    try { mode3D.controls.dispose(); } catch (_) {}
+    try { mode3D.renderer.dispose(); } catch (_) {}
+    mode3D = null;
+  }
+
+  container.innerHTML = '';
+  container.style.display = 'none';
+  hud.style.display = 'none';
+  panel.style.display = 'none';
+  overlay.style.display = 'flex';
+  statusMsg.textContent = '';
+  statusMsg.classList.remove('error');
+
+  state.main = false; state.V = 6; state.R = 20; lastChange = null;
+  vSlider.value = 4; rSlider.value = 20;
+  logRows.length = 0; renderTable(); tableBox.style.display = 'none';
+  circuit = null; currentMode = null;
+  startBtn.disabled = false; demoBtn.disabled = false;
+}
+
+renderTable();
+startBtn.addEventListener('click', startAR);
+demoBtn.addEventListener('click', () => start3DMode('Mode 3D — tanpa kamera.'));
+stopBtn.addEventListener('click', stopAR);
+
+// Untuk keperluan uji otomatis
+window.__ohm = { state, syncUI, get circuit() { return circuit; } };
+</script>
+</body>
+</html>

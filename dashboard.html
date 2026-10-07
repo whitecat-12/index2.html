@@ -1,0 +1,4055 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#eef4ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>MyFisika — Belajar Listrik Interaktif</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#eef4ff;
+  --surface:#ffffff;
+  --text:#0f1f3d;
+  --text-2:#334768;
+  --muted:#6b7c96;
+  --muted-2:#96a3b8;
+
+  --blue:#2563eb;
+  --blue-lite:#60a5fa;
+  --blue-soft:#dbeafe;
+  --blue-border:#93c5fd;
+
+  --purple:#7c3aed;
+  --purple-lite:#a78bfa;
+  --purple-soft:#ede9fe;
+  --purple-border:#c4b5fd;
+
+  --teal:#0d9488;
+  --teal-lite:#5eead4;
+  --teal-soft:#ccfbf1;
+  --teal-border:#5eead4;
+
+  --amber:#d97706;
+  --amber-lite:#fbbf24;
+  --amber-soft:#fef3c7;
+  --amber-border:#fcd34d;
+
+  --pink:#db2777;
+  --pink-lite:#f472b6;
+  --pink-soft:#fce7f3;
+  --pink-border:#f9a8d4;
+
+  --indigo:#4f46e5;
+  --indigo-soft:#e0e7ff;
+  --indigo-border:#a5b4fc;
+
+  --orange:#ea580c;
+  --orange-soft:#ffedd5;
+  --orange-border:#fdba74;
+
+  --cyan:#0891b2;
+  --cyan-soft:#cffafe;
+  --cyan-border:#67e8f9;
+
+  --danger:#e11d48;
+
+  --r-xl:26px;
+  --r-lg:20px;
+  --r-md:16px;
+  --r-sm:12px;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  position:fixed;inset:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;font-size:inherit}
+i{line-height:1;display:inline-flex}
+
+.app{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
+.app::before{content:'';position:absolute;inset:0;z-index:0;background:var(--bg)}
+.app::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle, var(--blue-soft) 40px, transparent 41px),
+    radial-gradient(circle, var(--purple-soft) 30px, transparent 31px),
+    radial-gradient(circle, var(--teal-soft) 35px, transparent 36px),
+    radial-gradient(circle, var(--amber-soft) 25px, transparent 26px),
+    radial-gradient(circle, var(--pink-soft) 28px, transparent 29px);
+  background-size:320px 320px,280px 280px,300px 300px,240px 240px,260px 260px;
+  background-position:-60px 5%,90% 12%,10% 55%,95% 70%,-50px 95%;
+  background-repeat:no-repeat;
+  opacity:.75;
+}
+
+/* ============ HEADER ============ */
+.header{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+  padding:calc(var(--safe-top) + 4px) 18px 10px;
+  flex-shrink:0;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.9) 0%,
+    rgba(255,255,255,.55) 60%,
+    rgba(255,255,255,0) 100%);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(147,197,253,.25);
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{
+  width:42px;height:42px;border-radius:14px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:var(--blue);color:#ffffff;font-size:18px;
+  border:2.5px solid #ffffff;
+  box-shadow:0 3px 0 var(--blue-border);
+  transform:rotate(-4deg);
+}
+.brand-name{font-size:18.5px;font-weight:800;letter-spacing:-.5px;line-height:1.05;color:var(--text)}
+.brand-name b{color:var(--blue);font-weight:800}
+.brand-sub{
+  font-size:9px;color:var(--blue);
+  font-weight:800;letter-spacing:1.4px;margin-top:4px;
+  background:var(--blue-soft);
+  display:inline-block;padding:2px 7px;border-radius:6px;
+}
+
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+.total-points{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:14px;
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border:2.5px solid var(--amber-border);
+  color:var(--amber);font-size:11px;font-weight:800;
+  box-shadow:0 3px 0 var(--amber-border);
+  transition:transform .25s var(--ease);
+  letter-spacing:-.1px;
+}
+.total-points i{font-size:12px;color:#b45309}
+.total-points b{font-size:14px;color:#78350f;letter-spacing:-.3px}
+.total-points.bump{animation:bump .5s var(--ease)}
+@keyframes bump{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.18)}
+  100%{transform:scale(1)}
+}
+
+.icon-btn{
+  position:relative;
+  width:42px;height:42px;border-radius:14px;
+  display:grid;place-items:center;
+  background:var(--amber-soft);
+  border:2.5px solid var(--amber-border);
+  color:var(--amber);font-size:16px;
+  transition:transform .2s var(--ease);
+}
+.icon-btn:active{transform:scale(.9)}
+
+/* ============ MAIN VIEW ============ */
+.main-view{position:relative;z-index:5;flex:1;min-height:0;overflow:hidden}
+.tab-panel{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.tab-panel.active{opacity:1;pointer-events:auto}
+.scroll{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:0 20px calc(24px + var(--safe-bottom));
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ===== 3D VIEWER ===== */
+.viewer-card{
+  position:relative;background:transparent;border:none;
+  border-radius:var(--r-xl);box-shadow:none;
+  padding:0 0 14px;margin-bottom:22px;overflow:visible;
+}
+.stage3d{
+  position:relative;width:100%;aspect-ratio:1 / 0.92;
+  border-radius:var(--r-lg);overflow:hidden;border:none;
+  background:#ffffff;touch-action:none;cursor:pointer;z-index:1;
+}
+.stage3d:active{cursor:pointer}
+.stage3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2;touch-action:none}
+.stage-corner{position:absolute;width:26px;height:26px;border:3px solid var(--blue);opacity:.6;pointer-events:none;z-index:4}
+.stage-corner.tl{top:10px;left:10px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.stage-corner.tr{top:10px;right:10px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.stage-corner.bl{bottom:10px;left:10px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.stage-corner.br{bottom:10px;right:10px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.stage-tag{
+  position:absolute;top:14px;left:14px;z-index:6;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 11px;border-radius:999px;
+  font-size:9.5px;font-weight:800;letter-spacing:.9px;color:#ffffff;
+  background:var(--blue);border:2px solid #ffffff;
+  box-shadow:0 3px 0 var(--blue-border);
+}
+.stage-tag .pulse{
+  width:7px;height:7px;border-radius:50%;background:#ffffff;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,255,255,.7)}
+  50%{opacity:.75;box-shadow:0 0 0 6px rgba(255,255,255,0)}
+}
+.stage-hint{
+  position:absolute;bottom:14px;left:14px;z-index:6;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 12px;border-radius:999px;
+  font-size:10px;font-weight:800;color:var(--text-2);
+  background:rgba(255,255,255,.94);
+  border:2px solid var(--blue-border);
+  box-shadow:0 3px 0 rgba(147,197,253,.55);
+  pointer-events:none;transition:opacity .35s var(--ease);
+}
+.stage-hint i{color:var(--blue);font-size:11px}
+.stage-hint.hide{opacity:0}
+.stage-load{
+  position:absolute;inset:0;z-index:8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  background:rgba(255,255,255,.92);
+  transition:opacity .35s var(--ease), visibility .35s;
+}
+.stage-load.hide{opacity:0;visibility:hidden;pointer-events:none}
+.ring{
+  width:40px;height:40px;border-radius:50%;
+  border:4px solid var(--blue-soft);
+  border-top-color:var(--blue);
+  animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stage-load span{font-size:11px;font-weight:800;color:var(--muted)}
+.stage-fallback{
+  position:absolute;inset:0;z-index:3;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:26px 22px;text-align:center;
+}
+.stage-fallback.show{display:flex}
+.stage-fallback .fb-ico{
+  width:82px;height:82px;border-radius:50%;
+  display:grid;place-items:center;font-size:34px;color:#ffffff;
+  background:var(--blue);border:4px solid #ffffff;
+  box-shadow:0 5px 0 var(--blue-border);
+  animation:floaty 3.6s ease-in-out infinite;
+}
+.stage-fallback b{font-size:12.5px;font-weight:800;color:var(--text)}
+.stage-fallback span{font-size:10.5px;font-weight:600;color:var(--muted);line-height:1.55;max-width:250px}
+.stage-fallback code{
+  font-family:inherit;font-size:10px;font-weight:800;color:var(--blue);
+  background:var(--blue-soft);padding:2px 6px;border-radius:5px;
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;overflow:hidden;
+  background:var(--blue);border:3px solid #ffffff;
+  border-radius:var(--r-xl);padding:22px 20px;
+  margin-bottom:22px;box-shadow:0 6px 0 var(--blue-border);
+}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:var(--blue-lite);opacity:.5}
+.hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:var(--blue-lite);opacity:.35}
+.hero-ico{position:absolute;right:8px;bottom:-10px;font-size:100px;color:#ffffff;opacity:.22;transform:rotate(-12deg);z-index:1}
+.hero h2{font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-.4px;position:relative;line-height:1.3;color:#ffffff;z-index:2}
+.hero p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.9);max-width:85%;position:relative;font-weight:500;z-index:2}
+
+/* ============ CARD GRID ============ */
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:0}
+.menu-card{
+  position:relative;padding:16px 14px;border-radius:var(--r-lg);
+  background:var(--surface);border:3px solid var(--blue-border);
+  transition:transform .18s var(--ease), opacity .25s var(--ease);
+  overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:138px;text-align:left;
+  box-shadow:0 4px 0 var(--blue-border);
+  cursor:pointer;
+}
+.menu-card:nth-child(2){border-color:var(--purple-border);box-shadow:0 4px 0 var(--purple-border)}
+.menu-card:nth-child(3){border-color:var(--teal-border);box-shadow:0 4px 0 var(--teal-border)}
+.menu-card:nth-child(4){border-color:var(--amber-border);box-shadow:0 4px 0 var(--amber-border)}
+.menu-card:nth-child(5){border-color:var(--pink-border);box-shadow:0 4px 0 var(--pink-border)}
+.menu-card:nth-child(6){border-color:var(--indigo-border);box-shadow:0 4px 0 var(--indigo-border)}
+.menu-card:nth-child(7){border-color:var(--orange-border);box-shadow:0 4px 0 var(--orange-border)}
+.menu-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:var(--blue-soft);pointer-events:none}
+.menu-card:nth-child(2)::before{background:var(--purple-soft)}
+.menu-card:nth-child(3)::before{background:var(--teal-soft)}
+.menu-card:nth-child(4)::before{background:var(--amber-soft)}
+.menu-card:nth-child(5)::before{background:var(--pink-soft)}
+.menu-card:nth-child(6)::before{background:var(--indigo-soft)}
+.menu-card:nth-child(7)::before{background:var(--orange-soft)}
+.menu-card::after{content:'';position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:var(--blue);z-index:2}
+.menu-card:nth-child(2)::after{background:var(--purple)}
+.menu-card:nth-child(3)::after{background:var(--teal)}
+.menu-card:nth-child(4)::after{background:var(--amber)}
+.menu-card:nth-child(5)::after{background:var(--pink)}
+.menu-card:nth-child(6)::after{background:var(--indigo)}
+.menu-card:nth-child(7)::after{background:var(--orange)}
+.menu-card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--blue-border)}
+.menu-card:nth-child(2):active{box-shadow:0 1px 0 var(--purple-border)}
+.menu-card:nth-child(3):active{box-shadow:0 1px 0 var(--teal-border)}
+.menu-card:nth-child(4):active{box-shadow:0 1px 0 var(--amber-border)}
+.menu-card:nth-child(5):active{box-shadow:0 1px 0 var(--pink-border)}
+.menu-card:nth-child(6):active{box-shadow:0 1px 0 var(--indigo-border)}
+.menu-card:nth-child(7):active{box-shadow:0 1px 0 var(--orange-border)}
+
+.mc-icon{
+  width:46px;height:46px;flex-shrink:0;border-radius:14px;
+  display:grid;place-items:center;font-size:18px;
+  background:var(--blue);color:#ffffff;border:2.5px solid #ffffff;
+  box-shadow:0 3px 0 var(--blue-border);transform:rotate(-3deg);
+  position:relative;z-index:1;
+}
+.mc-icon.purple{background:var(--purple);box-shadow:0 3px 0 var(--purple-border)}
+.mc-icon.teal{background:var(--teal);box-shadow:0 3px 0 var(--teal-border)}
+.mc-icon.amber{background:var(--amber);box-shadow:0 3px 0 var(--amber-border)}
+.mc-icon.pink{background:var(--pink);box-shadow:0 3px 0 var(--pink-border)}
+.mc-icon.indigo{background:var(--indigo);box-shadow:0 3px 0 var(--indigo-border)}
+.mc-icon.orange{background:var(--orange);box-shadow:0 3px 0 var(--orange-border)}
+
+.mc-title{font-size:13.5px;font-weight:800;line-height:1.35;letter-spacing:-.2px;position:relative;z-index:1;color:var(--text)}
+.mc-sub{font-size:11.5px;color:var(--muted);line-height:1.45;position:relative;z-index:1;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.mc-arrow{
+  position:absolute;bottom:12px;right:12px;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);
+  font-size:10px;transition:transform .2s var(--ease);
+}
+.menu-card:nth-child(2) .mc-arrow{background:var(--purple-soft);color:var(--purple)}
+.menu-card:nth-child(3) .mc-arrow{background:var(--teal-soft);color:var(--teal)}
+.menu-card:nth-child(4) .mc-arrow{background:var(--amber-soft);color:var(--amber)}
+.menu-card:nth-child(5) .mc-arrow{background:var(--pink-soft);color:var(--pink)}
+.menu-card:nth-child(6) .mc-arrow{background:var(--indigo-soft);color:var(--indigo)}
+.menu-card:nth-child(7) .mc-arrow{background:var(--orange-soft);color:var(--orange)}
+.menu-card:active .mc-arrow{transform:translateX(3px)}
+
+/* ============ CHIPS ============ */
+.chips{display:flex;gap:10px;padding:0 20px 18px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:10px 16px;border-radius:999px;
+  background:var(--surface);border:2.5px solid var(--blue-border);
+  color:var(--text);font-size:12.5px;font-weight:800;
+  white-space:nowrap;transition:all .22s var(--ease);
+  display:inline-flex;align-items:center;gap:8px;
+  min-height:42px;box-shadow:0 3px 0 var(--blue-border);
+}
+.chip i{font-size:12px;color:var(--blue)}
+.chip:nth-child(2){border-color:var(--purple-border);box-shadow:0 3px 0 var(--purple-border)}
+.chip:nth-child(2) i{color:var(--purple)}
+.chip:nth-child(3){border-color:var(--teal-border);box-shadow:0 3px 0 var(--teal-border)}
+.chip:nth-child(3) i{color:var(--teal)}
+.chip:nth-child(4){border-color:var(--amber-border);box-shadow:0 3px 0 var(--amber-border)}
+.chip:nth-child(4) i{color:var(--amber)}
+.chip:nth-child(5){border-color:var(--pink-border);box-shadow:0 3px 0 var(--pink-border)}
+.chip:nth-child(5) i{color:var(--pink)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#ffffff;box-shadow:0 3px 0 var(--blue-border)}
+.chip.active i{color:#ffffff}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--blue-border)}
+
+/* ============ RUMUS ============ */
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.coll{
+  position:relative;padding:18px 12px;border-radius:var(--r-lg);
+  background:var(--surface);border:3px solid var(--blue-border);
+  box-shadow:0 4px 0 var(--blue-border);text-align:center;
+  transition:transform .18s var(--ease);overflow:hidden;
+  cursor:pointer;
+}
+.coll:nth-child(2){border-color:var(--purple-border);box-shadow:0 4px 0 var(--purple-border)}
+.coll:nth-child(3){border-color:var(--teal-border);box-shadow:0 4px 0 var(--teal-border)}
+.coll:nth-child(4){border-color:var(--amber-border);box-shadow:0 4px 0 var(--amber-border)}
+.coll:nth-child(5){border-color:var(--pink-border);box-shadow:0 4px 0 var(--pink-border)}
+.coll:nth-child(6){border-color:var(--indigo-border);box-shadow:0 4px 0 var(--indigo-border)}
+.coll:nth-child(7){border-color:var(--orange-border);box-shadow:0 4px 0 var(--orange-border)}
+.coll:active{transform:translateY(3px)}
+.coll-ico{
+  width:62px;height:62px;margin:0 auto 12px;border-radius:50%;
+  display:grid;place-items:center;font-size:26px;color:#ffffff;
+  background:var(--blue);border:3px solid #ffffff;
+  box-shadow:0 4px 0 var(--blue-border);transform:rotate(-3deg);
+}
+.coll:nth-child(2) .coll-ico{background:var(--purple);box-shadow:0 4px 0 var(--purple-border)}
+.coll:nth-child(3) .coll-ico{background:var(--teal);box-shadow:0 4px 0 var(--teal-border)}
+.coll:nth-child(4) .coll-ico{background:var(--amber);box-shadow:0 4px 0 var(--amber-border)}
+.coll:nth-child(5) .coll-ico{background:var(--pink);box-shadow:0 4px 0 var(--pink-border)}
+.coll:nth-child(6) .coll-ico{background:var(--indigo);box-shadow:0 4px 0 var(--indigo-border)}
+.coll:nth-child(7) .coll-ico{background:var(--orange);box-shadow:0 4px 0 var(--orange-border)}
+.coll-name{font-size:12.5px;font-weight:800;line-height:1.3;margin-bottom:3px;color:var(--text)}
+.coll-latin{font-size:10.5px;color:var(--muted-2);font-weight:700;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{
+  position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;font-size:10px;
+  background:var(--blue);color:#ffffff;border:2px solid #ffffff;
+}
+
+/* ============ PROFIL ============ */
+.profile{
+  border-radius:var(--r-xl);padding:26px 20px 20px;text-align:center;
+  background:var(--blue);border:3px solid #ffffff;margin-bottom:22px;
+  position:relative;overflow:hidden;box-shadow:0 6px 0 var(--blue-border);
+}
+.profile::before{content:'';position:absolute;top:-40px;left:-40px;width:120px;height:120px;border-radius:50%;background:var(--blue-lite);opacity:.4}
+.profile::after{content:'';position:absolute;bottom:-50px;right:-50px;width:150px;height:150px;border-radius:50%;background:var(--blue-lite);opacity:.3}
+.avatar{
+  width:88px;height:88px;margin:0 auto 14px;border-radius:50%;
+  display:grid;place-items:center;font-size:36px;color:var(--blue);
+  background:#ffffff;border:4px solid var(--blue);
+  box-shadow:0 4px 0 rgba(0,0,0,.1);position:relative;z-index:1;transform:rotate(-4deg);
+}
+.p-name{font-size:20px;font-weight:800;margin-bottom:4px;letter-spacing:-.3px;color:#ffffff;position:relative;z-index:1}
+.p-mail{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:18px;position:relative;z-index:1;font-weight:600}
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);padding-top:18px;border-top:2px dashed rgba(255,255,255,.4);position:relative;z-index:1}
+.p-stats b{display:block;font-size:22px;font-weight:800;color:#ffffff;margin-bottom:3px;letter-spacing:-.3px}
+.p-stats span{font-size:10.5px;color:rgba(255,255,255,.85);font-weight:700}
+.danger{
+  width:100%;height:56px;border-radius:16px;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-size:13.5px;font-weight:800;
+  background:var(--pink-soft);border:3px solid var(--pink-border);
+  color:var(--pink);transition:transform .18s var(--ease);
+  margin-top:4px;box-shadow:0 4px 0 var(--pink-border);
+}
+.danger:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pink-border)}
+
+/* ============ BOTTOM NAV ============ */
+.nav{
+  position:relative;z-index:40;flex-shrink:0;
+  display:flex;align-items:flex-end;justify-content:space-around;
+  padding:10px 8px calc(10px + var(--safe-bottom));
+  background:var(--surface);border-top:3px solid var(--blue);
+}
+.nav-btn{
+  flex:1;max-width:82px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:8px 0 5px;color:var(--muted-2);font-size:10px;font-weight:800;
+  border-radius:14px;transition:color .22s;position:relative;
+}
+.nav-btn i{font-size:20px;transition:transform .25s var(--ease)}
+.nav-btn.active{color:var(--blue)}
+.nav-btn.active i{transform:translateY(-2px)}
+.nav-btn.active::before{
+  content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  width:26px;height:4px;border-radius:0 0 4px 4px;background:var(--blue);
+}
+.nav-ar{flex:0 0 auto;max-width:none;padding:0}
+.ar-fab{
+  width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  font-size:24px;color:#ffffff;background:var(--blue);
+  border:4px solid #ffffff;box-shadow:0 5px 0 var(--blue-border);
+  margin-top:-28px;transition:transform .22s var(--ease), box-shadow .22s;
+}
+.nav-ar:active .ar-fab{transform:translateY(3px);box-shadow:0 2px 0 var(--blue-border)}
+.nav-ar span{font-size:10px;margin-top:6px;color:var(--muted-2);font-weight:800}
+.nav-ar.active span{color:var(--blue)}
+
+/* ============ DETAIL SCREENS ============ */
+.screen{
+  position:absolute;inset:0;z-index:60;
+  display:flex;flex-direction:column;
+  background:var(--bg);transform:translateX(100%);
+  transition:transform .36s var(--ease);overflow:hidden;
+}
+.screen.active{transform:translateX(0)}
+.screen::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle, var(--blue-soft) 30px, transparent 31px),
+    radial-gradient(circle, var(--purple-soft) 25px, transparent 26px),
+    radial-gradient(circle, var(--teal-soft) 28px, transparent 29px),
+    radial-gradient(circle, var(--pink-soft) 22px, transparent 23px);
+  background-size:300px 300px, 260px 260px, 280px 280px, 240px 240px;
+  background-position:-50px 0, 90% 15%, 5% 60%, 95% 85%;
+  background-repeat:no-repeat;opacity:.6;
+}
+.screen-head{
+  flex-shrink:0;position:relative;z-index:1;
+  display:flex;align-items:center;gap:14px;
+  padding:calc(var(--safe-top) + 14px) 20px 16px;
+}
+.back{
+  width:46px;height:46px;flex-shrink:0;border-radius:16px;
+  display:grid;place-items:center;background:var(--amber);
+  border:3px solid #ffffff;color:#ffffff;font-size:16px;
+  box-shadow:0 4px 0 var(--amber-border);transition:transform .2s var(--ease);
+}
+.back:active{transform:translateY(3px);box-shadow:0 1px 0 var(--amber-border)}
+.screen-head h1{font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1.25;color:var(--text)}
+.screen-head p{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600}
+.screen-body{
+  flex:1;min-height:0;position:relative;z-index:1;
+  overflow-y:auto;padding:0 20px calc(32px + var(--safe-bottom));
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.screen-body::-webkit-scrollbar{display:none}
+
+.screen-points{
+  margin-left:auto;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 11px;border-radius:12px;
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border:2.5px solid var(--amber-border);
+  color:var(--amber);font-size:10.5px;font-weight:800;
+  box-shadow:0 3px 0 var(--amber-border);
+  letter-spacing:-.1px;
+}
+.screen-points i{font-size:11px;color:#b45309}
+.screen-points b{font-size:13px;color:#78350f;letter-spacing:-.2px}
+.screen-points.bump{animation:bump .5s var(--ease)}
+
+.quiz-banner{
+  display:flex;align-items:center;gap:14px;
+  padding:16px;border-radius:var(--r-lg);
+  background:var(--surface);border:3px solid var(--teal-border);
+  box-shadow:0 4px 0 var(--teal-border);
+  margin-bottom:14px;
+}
+.quiz-banner .qb-ico{
+  width:52px;height:52px;flex-shrink:0;border-radius:16px;
+  display:grid;place-items:center;font-size:22px;color:#fff;
+  background:var(--teal);border:3px solid #fff;
+  box-shadow:0 3px 0 var(--teal-border);transform:rotate(-3deg);
+}
+.quiz-banner .qb-ico.purple{background:var(--purple);box-shadow:0 3px 0 var(--purple-border)}
+.quiz-banner .qb-ico.amber{background:var(--amber);box-shadow:0 3px 0 var(--amber-border)}
+.quiz-banner .qb-ico.pink{background:var(--pink);box-shadow:0 3px 0 var(--pink-border)}
+.quiz-banner .qb-ico.indigo{background:var(--indigo);box-shadow:0 3px 0 var(--indigo-border)}
+.quiz-banner .qb-ico.orange{background:var(--orange);box-shadow:0 3px 0 var(--orange-border)}
+.quiz-banner b{display:block;font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px}
+.quiz-banner span{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.5}
+
+/* ============ LATIHAN SOAL / QUIZ ============ */
+.quiz{
+  background:var(--surface);border:3px solid var(--teal-border);
+  border-radius:var(--r-lg);padding:18px;margin-bottom:14px;
+  box-shadow:0 4px 0 var(--teal-border);
+}
+.quiz-head{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:800;color:var(--teal);
+  margin-bottom:16px;letter-spacing:-.1px;
+  flex-wrap:wrap;
+}
+.quiz-head .bullet{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--teal);color:#fff;
+  display:grid;place-items:center;font-size:10px;flex-shrink:0;
+}
+.quiz-score{
+  margin-left:auto;font-size:10.5px;font-weight:800;
+  padding:5px 11px;border-radius:999px;
+  background:var(--teal-soft);color:var(--teal);
+  border:2px solid var(--teal-border);
+  transition:all .25s var(--ease);
+  display:inline-flex;align-items:center;gap:5px;
+  letter-spacing:-.1px;
+}
+.quiz-score i{font-size:10px}
+.quiz-score.perfect{background:var(--teal);color:#fff;border-color:var(--teal)}
+.quiz-item{padding:14px 0;border-top:2px dashed var(--blue-soft)}
+.quiz-item:first-of-type{border-top:none;padding-top:0}
+.quiz-q{
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;font-weight:700;color:var(--text);
+  line-height:1.5;margin-bottom:11px;
+}
+.q-num{
+  flex-shrink:0;width:22px;height:22px;border-radius:7px;
+  background:var(--teal);color:#fff;
+  display:grid;place-items:center;
+  font-size:11px;font-weight:800;margin-top:1px;
+}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;padding-left:32px}
+.quiz-opts button{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:12px;
+  background:#fff;border:2.5px solid var(--blue-border);
+  font-family:inherit;font-size:12.5px;font-weight:700;
+  color:var(--text-2);text-align:left;
+  transition:transform .18s var(--ease), background .2s, border-color .2s;
+  box-shadow:0 3px 0 var(--blue-border);
+  min-height:42px;
+}
+.opt-key{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:var(--blue-soft);color:var(--blue);
+  display:grid;place-items:center;
+  font-size:11px;font-weight:800;
+}
+.quiz-opts button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--blue-border)}
+.quiz-opts button:disabled{cursor:default}
+.quiz-opts button.correct{
+  background:var(--teal-soft);border-color:var(--teal);
+  color:var(--teal);box-shadow:0 3px 0 var(--teal);
+}
+.quiz-opts button.correct .opt-key{background:var(--teal);color:#fff}
+.quiz-opts button.wrong{
+  background:var(--pink-soft);border-color:var(--danger);
+  color:var(--danger);box-shadow:0 3px 0 var(--danger);
+}
+.quiz-opts button.wrong .opt-key{background:var(--danger);color:#fff}
+.quiz-opts button.correct::after{
+  content:'\f00c';font-family:'Font Awesome 6 Free';font-weight:900;
+  margin-left:auto;font-size:12px;
+}
+.quiz-opts button.wrong::after{
+  content:'\f00d';font-family:'Font Awesome 6 Free';font-weight:900;
+  margin-left:auto;font-size:12px;
+}
+
+/* ============ POPUP POINT ============ */
+.popup-backdrop{
+  position:fixed;inset:0;z-index:199;
+  background:rgba(15,31,61,.18);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.popup-backdrop.show{opacity:1}
+
+.point-popup{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.4);
+  z-index:200;pointer-events:none;
+  opacity:0;
+  transition:all .45s cubic-bezier(.34,1.56,.64,1);
+}
+.point-popup.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+.point-popup-inner{
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:24px 36px;border-radius:28px;
+  background:linear-gradient(135deg,#fef3c7,#fcd34d);
+  border:4px solid #ffffff;
+  box-shadow:0 16px 40px rgba(217,119,6,.4),
+             0 0 0 6px var(--amber-soft),
+             0 10px 0 var(--amber-border);
+  min-width:220px;
+}
+.point-popup-inner.wrong{
+  background:linear-gradient(135deg,#fce7f3,#f9a8d4);
+  box-shadow:0 16px 40px rgba(225,29,72,.35),
+             0 0 0 6px var(--pink-soft),
+             0 10px 0 var(--pink-border);
+}
+.point-popup-ico{
+  font-size:52px;
+  animation:popIcon .7s cubic-bezier(.34,1.56,.64,1);
+}
+.point-popup-inner:not(.wrong) .point-popup-ico{color:#d97706}
+.point-popup-inner.wrong .point-popup-ico{color:var(--danger)}
+@keyframes popIcon{
+  0%{transform:scale(0) rotate(-200deg)}
+  60%{transform:scale(1.4) rotate(15deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+.point-popup-pts{
+  font-size:44px;font-weight:800;letter-spacing:-1.5px;
+  color:#78350f;line-height:1;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.point-popup-inner.wrong .point-popup-pts{
+  color:var(--danger);font-size:34px;letter-spacing:-1px;
+}
+.point-popup-label{
+  font-size:11px;font-weight:800;letter-spacing:2.5px;
+  color:#b45309;text-transform:uppercase;
+}
+.point-popup-inner.wrong .point-popup-label{color:var(--pink)}
+
+.point-popup-total{
+  margin-top:2px;padding:6px 14px;border-radius:999px;
+  background:#ffffff;border:2px solid var(--amber-border);
+  font-size:11.5px;font-weight:800;color:var(--amber);
+  display:inline-flex;align-items:center;gap:6px;
+  letter-spacing:-.1px;
+}
+.point-popup-total i{font-size:11px;color:#b45309}
+.point-popup-total b{font-size:13px;color:#78350f}
+.point-popup-inner.wrong .point-popup-total{
+  border-color:var(--pink-border);color:var(--pink);
+}
+.point-popup-inner.wrong .point-popup-total i,
+.point-popup-inner.wrong .point-popup-total b{color:var(--pink)}
+
+.point-popup .confetti{
+  position:absolute;top:50%;left:50%;
+  font-size:22px;line-height:1;
+  animation:confetti 1.1s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes confetti{
+  0%{transform:translate(-50%,-50%) scale(0) rotate(0);opacity:1}
+  20%{transform:translate(-50%,-50%) scale(1.2) rotate(60deg);opacity:1}
+  100%{transform:translate(calc(-50% + var(--cx,0px)), calc(-50% + var(--cy,-120px))) scale(.6) rotate(360deg);opacity:0}
+}
+
+/* ============ COMING SOON ============ */
+.coming{
+  position:absolute;inset:0;z-index:80;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  transform:translateY(100%);
+  transition:transform .45s var(--ease), visibility .45s;
+  overflow:hidden;visibility:hidden;
+  will-change:transform;
+}
+.coming.active{transform:translateY(0);visibility:visible}
+.coming::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle, var(--blue-soft) 36px, transparent 37px),
+    radial-gradient(circle, var(--purple-soft) 28px, transparent 29px),
+    radial-gradient(circle, var(--teal-soft) 32px, transparent 33px),
+    radial-gradient(circle, var(--amber-soft) 24px, transparent 25px),
+    radial-gradient(circle, var(--pink-soft) 26px, transparent 27px);
+  background-size:320px 320px,280px 280px,300px 300px,240px 240px,260px 260px;
+  background-position:-60px 5%,90% 12%,10% 55%,95% 70%,-50px 95%;
+  background-repeat:no-repeat;opacity:.7;
+}
+.coming-back{
+  position:relative;z-index:2;
+  width:46px;height:46px;flex-shrink:0;
+  margin:calc(var(--safe-top) + 14px) 0 0 20px;
+  border-radius:16px;display:grid;place-items:center;
+  background:var(--amber);border:3px solid #ffffff;color:#ffffff;font-size:16px;
+  box-shadow:0 4px 0 var(--amber-border);
+  transition:transform .2s var(--ease);
+}
+.coming-back:active{transform:translateY(3px);box-shadow:0 1px 0 var(--amber-border)}
+.coming-inner{
+  position:relative;z-index:2;flex:1;min-height:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 30px calc(40px + var(--safe-bottom));
+  text-align:center;overflow-y:auto;scrollbar-width:none;
+}
+.coming-inner::-webkit-scrollbar{display:none}
+.coming-icon{
+  width:130px;height:130px;border-radius:50%;
+  display:grid;place-items:center;font-size:56px;color:#ffffff;
+  background:var(--blue);border:5px solid #ffffff;
+  box-shadow:0 8px 0 var(--blue-border), 0 0 0 5px var(--blue-soft);
+  animation:floaty 3.4s ease-in-out infinite;
+  margin-bottom:26px;
+  transition:background .3s, box-shadow .3s;
+}
+.coming-icon.purple{background:var(--purple);box-shadow:0 8px 0 var(--purple-border), 0 0 0 5px var(--purple-soft)}
+.coming-icon.teal{background:var(--teal);box-shadow:0 8px 0 var(--teal-border), 0 0 0 5px var(--teal-soft)}
+.coming-icon.amber{background:var(--amber);box-shadow:0 8px 0 var(--amber-border), 0 0 0 5px var(--amber-soft)}
+.coming-icon.pink{background:var(--pink);box-shadow:0 8px 0 var(--pink-border), 0 0 0 5px var(--pink-soft)}
+.coming-icon.indigo{background:var(--indigo);box-shadow:0 8px 0 var(--indigo-border), 0 0 0 5px var(--indigo-soft)}
+.coming-icon.orange{background:var(--orange);box-shadow:0 8px 0 var(--orange-border), 0 0 0 5px var(--orange-soft)}
+
+.coming-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:999px;
+  font-size:10.5px;font-weight:800;letter-spacing:1.5px;
+  color:#ffffff;background:var(--pink);
+  border:2.5px solid #ffffff;box-shadow:0 3px 0 var(--pink-border);
+  margin-bottom:18px;
+}
+.coming-badge .pulse{
+  width:7px;height:7px;border-radius:50%;background:#ffffff;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.coming-title{
+  font-size:26px;font-weight:800;letter-spacing:-.6px;
+  line-height:1.2;color:var(--text);margin-bottom:10px;
+  max-width:320px;
+}
+.coming-sub{
+  font-size:13.5px;font-weight:600;color:var(--muted);
+  line-height:1.65;max-width:300px;margin-bottom:28px;
+}
+.coming-bar{
+  width:min(240px, 70%);height:12px;border-radius:999px;
+  background:var(--blue-soft);overflow:hidden;
+  border:2px solid var(--blue-border);
+  margin-bottom:12px;position:relative;
+}
+.coming-bar span{
+  position:absolute;top:0;bottom:0;border-radius:999px;
+  background:var(--blue);animation:loading 1.8s ease-in-out infinite;
+}
+@keyframes loading{
+  0%{left:-40%;width:40%}
+  50%{left:30%;width:50%}
+  100%{left:100%;width:40%}
+}
+.coming-note{
+  font-size:10.5px;font-weight:800;letter-spacing:1px;
+  color:var(--muted-2);text-transform:uppercase;
+  margin-bottom:34px;
+}
+.coming-btn{
+  height:56px;padding:0 26px;border-radius:16px;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-size:13.5px;font-weight:800;color:#ffffff;
+  background:var(--blue);border:3px solid #ffffff;
+  box-shadow:0 4px 0 var(--blue-border);
+  transition:transform .18s var(--ease);
+}
+.coming-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--blue-border)}
+
+/* ============================================
+   AI CHAT
+   ============================================ */
+.chat-wrap{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+
+.chat-body{
+  flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;
+  padding:14px 20px 14px;
+  display:flex;flex-direction:column;gap:14px;
+  -webkit-overflow-scrolling:touch;
+}
+.chat-body::-webkit-scrollbar{display:none}
+
+.msg{display:flex;gap:10px;max-width:100%;animation:msgIn .35s var(--ease)}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.msg .av{
+  width:34px;height:34px;flex-shrink:0;border-radius:11px;
+  display:grid;place-items:center;font-size:14px;color:#fff;
+  background:var(--blue);border:2px solid #fff;
+  box-shadow:0 2.5px 0 var(--blue-border);
+}
+.msg.user .av{background:var(--purple);box-shadow:0 2.5px 0 var(--purple-border)}
+.msg .bubble{
+  padding:11px 14px;border-radius:16px;
+  font-size:13.5px;line-height:1.65;font-weight:500;
+  background:#fff;color:var(--text-2);
+  border:2.5px solid var(--blue-border);
+  box-shadow:0 3px 0 var(--blue-border);
+  max-width:80%;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+  overflow-x:auto;
+}
+.msg.user{flex-direction:row-reverse}
+.msg.user .bubble{
+  background:var(--blue);color:#fff;
+  border-color:#fff;
+  box-shadow:0 3px 0 var(--blue-border);
+}
+.msg .bubble strong{font-weight:800;color:var(--text)}
+.msg.user .bubble strong{color:#fff}
+.msg .bubble em{
+  font-style:normal;font-weight:800;font-family:monospace;
+  background:var(--blue-soft);color:var(--blue);
+  padding:1px 6px;border-radius:5px;
+  font-size:12.5px;
+}
+.msg.user .bubble em{background:rgba(255,255,255,.22);color:#fff}
+
+.msg .bubble p{margin:0 0 8px}
+.msg .bubble p:last-child{margin-bottom:0}
+.msg .bubble ul{
+  list-style:none;margin:6px 0 8px;padding:0;
+  display:flex;flex-direction:column;gap:5px;
+}
+.msg .bubble ul:last-child{margin-bottom:0}
+.msg .bubble li{
+  position:relative;padding-left:16px;
+  font-size:13px;line-height:1.6;
+}
+.msg .bubble li::before{
+  content:'';position:absolute;left:2px;top:8px;
+  width:6px;height:6px;border-radius:50%;background:var(--blue);
+}
+.msg.user .bubble li::before{background:#fff}
+.msg .bubble .section-title{
+  display:block;font-weight:800;color:var(--blue);
+  margin:9px 0 5px;font-size:13px;
+}
+.msg .bubble .section-title:first-child{margin-top:0}
+.msg.user .bubble .section-title{color:#fff}
+
+.msg .bubble .katex{font-size:1.02em}
+.msg .bubble .katex-display{
+  margin:8px 0;padding:2px 0;overflow-x:auto;overflow-y:hidden;
+}
+.msg .bubble .katex-display::-webkit-scrollbar{height:3px}
+.msg .bubble .katex-display::-webkit-scrollbar-thumb{background:var(--blue-border);border-radius:3px}
+
+.msg.typing .bubble{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:14px 16px;
+}
+.msg.typing .bubble i{
+  width:7px;height:7px;border-radius:50%;background:var(--blue);
+  animation:bounce 1.2s ease-in-out infinite;
+}
+.msg.typing .bubble i:nth-child(2){animation-delay:.15s}
+.msg.typing .bubble i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{
+  0%,80%,100%{transform:translateY(0);opacity:.5}
+  40%{transform:translateY(-6px);opacity:1}
+}
+
+.chat-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:14px 0 10px;gap:12px;
+}
+.chat-empty .hero-ai{
+  width:88px;height:88px;border-radius:50%;
+  display:grid;place-items:center;font-size:34px;color:#fff;
+  background:var(--blue);border:4px solid #fff;
+  box-shadow:0 5px 0 var(--blue-border);
+  animation:floaty 3.4s ease-in-out infinite;
+  margin-bottom:6px;
+}
+.chat-empty h3{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.chat-empty p{font-size:12px;color:var(--muted);font-weight:600;max-width:270px;line-height:1.6}
+
+.sugg{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  padding:0 6px;margin-top:6px;
+}
+.sugg button{
+  padding:8px 13px;border-radius:999px;
+  background:#fff;border:2px solid var(--blue-border);
+  color:var(--text);font-size:11.5px;font-weight:800;
+  box-shadow:0 2.5px 0 var(--blue-border);
+  transition:transform .18s var(--ease);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.sugg button i{color:var(--blue);font-size:11px}
+.sugg button:nth-child(2){border-color:var(--purple-border);box-shadow:0 2.5px 0 var(--purple-border)}
+.sugg button:nth-child(2) i{color:var(--purple)}
+.sugg button:nth-child(3){border-color:var(--teal-border);box-shadow:0 2.5px 0 var(--teal-border)}
+.sugg button:nth-child(3) i{color:var(--teal)}
+.sugg button:nth-child(4){border-color:var(--amber-border);box-shadow:0 2.5px 0 var(--amber-border)}
+.sugg button:nth-child(4) i{color:var(--amber)}
+.sugg button:active{transform:translateY(2px);box-shadow:none}
+
+.chat-input{
+  flex-shrink:0;padding:12px 16px calc(14px + var(--safe-bottom));
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.95) 55%,#fff 100%);
+  border-top:2px solid rgba(147,197,253,.4);
+  display:flex;align-items:flex-end;gap:10px;
+}
+.chat-input textarea{
+  flex:1;min-height:46px;max-height:120px;
+  padding:12px 14px;border-radius:16px;
+  background:#fff;border:2.5px solid var(--blue-border);
+  font-family:inherit;font-size:13.5px;font-weight:600;
+  color:var(--text);resize:none;outline:none;
+  line-height:1.4;
+  box-shadow:inset 0 2px 0 rgba(147,197,253,.18);
+  transition:border-color .2s;
+  scrollbar-width:none;
+}
+.chat-input textarea::-webkit-scrollbar{display:none}
+.chat-input textarea:focus{border-color:var(--blue)}
+.chat-input textarea::placeholder{color:var(--muted-2);font-weight:600}
+.chat-send{
+  width:46px;height:46px;flex-shrink:0;border-radius:14px;
+  display:grid;place-items:center;font-size:16px;color:#fff;
+  background:var(--blue);border:2.5px solid #fff;
+  box-shadow:0 3px 0 var(--blue-border);
+  transition:transform .15s var(--ease), opacity .2s;
+}
+.chat-send:active{transform:translateY(2px);box-shadow:0 1px 0 var(--blue-border)}
+.chat-send:disabled{opacity:.45;pointer-events:none}
+
+/* ============================================
+   MATERI RUMUS — DETAIL OVERLAY (BACAAN)
+   ============================================ */
+.rumus-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(15,31,61,.45);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  display:flex;align-items:center;justify-content:center;
+  padding:18px;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.rumus-overlay.show{opacity:1;pointer-events:auto}
+.rumus-detail{
+  background:#ffffff;width:100%;max-width:440px;max-height:88vh;
+  border-radius:var(--r-xl);
+  border:3px solid var(--blue-border);
+  box-shadow:0 10px 0 var(--blue-border), 0 20px 50px rgba(15,31,61,.3);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:scale(.94) translateY(12px);
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1);
+}
+.rumus-overlay.show .rumus-detail{transform:scale(1) translateY(0)}
+.rumus-detail-head{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 18px 16px;
+  background:var(--blue);color:#fff;
+  position:relative;flex-shrink:0;
+}
+.rumus-detail-head::after{
+  content:'';position:absolute;bottom:-14px;left:0;right:0;height:14px;
+  background:
+    radial-gradient(circle at 10px -3px, transparent 12px, var(--blue) 13px);
+  background-size:20px 20px;background-repeat:repeat-x;
+}
+.rumus-detail-ico{
+  width:52px;height:52px;border-radius:16px;flex-shrink:0;
+  display:grid;place-items:center;font-size:22px;
+  background:rgba(255,255,255,.2);
+  border:2.5px solid rgba(255,255,255,.6);
+}
+.rumus-detail-title{flex:1;min-width:0}
+.rumus-detail-title h2{
+  font-size:17px;font-weight:800;letter-spacing:-.3px;
+  line-height:1.2;margin-bottom:3px;
+}
+.rumus-detail-title p{
+  font-size:11px;font-weight:700;letter-spacing:.6px;
+  opacity:.85;font-family:monospace;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rumus-close{
+  width:38px;height:38px;border-radius:12px;flex-shrink:0;
+  display:grid;place-items:center;font-size:15px;color:#fff;
+  background:rgba(255,255,255,.2);
+  border:2px solid rgba(255,255,255,.6);
+  transition:transform .18s var(--ease);
+}
+.rumus-close:active{transform:scale(.9)}
+.rumus-detail-body{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:24px 20px calc(24px + var(--safe-bottom));
+  font-size:13.5px;line-height:1.7;color:var(--text-2);
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.rumus-detail-body::-webkit-scrollbar{display:none}
+.rumus-detail-body h3{
+  font-size:13px;font-weight:800;color:var(--blue);
+  letter-spacing:.3px;text-transform:uppercase;
+  margin:18px 0 8px;display:flex;align-items:center;gap:8px;
+}
+.rumus-detail-body h3:first-child{margin-top:0}
+.rumus-detail-body h3 i{font-size:12px}
+.rumus-detail-body p{margin-bottom:10px}
+.rumus-detail-body ul{
+  margin:0 0 12px;padding:0;list-style:none;
+  display:flex;flex-direction:column;gap:6px;
+}
+.rumus-detail-body ul li{
+  position:relative;padding-left:20px;font-size:13px;line-height:1.6;
+}
+.rumus-detail-body ul li::before{
+  content:'';position:absolute;left:4px;top:9px;
+  width:7px;height:7px;border-radius:50%;background:var(--blue);
+}
+.rumus-detail-body .rumus-box{
+  padding:16px 18px;border-radius:14px;
+  background:var(--blue-soft);
+  border:2.5px dashed var(--blue);
+  margin:12px 0;
+  text-align:center;
+  font-size:16px;font-weight:800;color:var(--blue);
+  letter-spacing:.3px;font-family:monospace;
+  line-height:1.5;
+  overflow-x:auto;
+}
+.rumus-detail-body .contoh-box{
+  padding:14px 16px;border-radius:14px;
+  background:var(--amber-soft);
+  border:2.5px solid var(--amber-border);
+  margin:12px 0;
+  font-size:12.5px;line-height:1.7;color:#78350f;
+}
+.rumus-detail-body .contoh-box b{color:#92400e;font-weight:800}
+.rumus-detail-body .tip-box{
+  padding:12px 14px;border-radius:12px;
+  background:var(--teal-soft);
+  border:2px solid var(--teal-border);
+  margin:12px 0;
+  font-size:12px;line-height:1.6;color:#115e59;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.rumus-detail-body .tip-box i{
+  color:var(--teal);font-size:14px;margin-top:2px;flex-shrink:0;
+}
+.rumus-detail-body .tip-box b{color:#134e4a;font-weight:800}
+.rumus-detail-body .symbol-table{
+  display:flex;flex-direction:column;gap:8px;
+  margin:12px 0;
+}
+.rumus-detail-body .symbol-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:10px;
+  background:#f8fafc;border:1.5px solid #e2e8f0;
+  font-size:12.5px;
+}
+.rumus-detail-body .symbol-row .sym{
+  flex-shrink:0;min-width:38px;text-align:center;
+  font-family:monospace;font-weight:800;font-size:14px;
+  color:var(--blue);
+}
+.rumus-detail-body .symbol-row .desc{
+  flex:1;color:var(--text-2);font-weight:600;
+}
+.rumus-detail-body .symbol-row .unit{
+  flex-shrink:0;font-size:11px;font-weight:800;
+  color:var(--muted);background:#e2e8f0;
+  padding:2px 8px;border-radius:6px;
+}
+
+/* ============ TESLA BIO OVERLAY ============ */
+.tesla-overlay{
+  position:fixed;inset:0;z-index:310;
+  background:rgba(15,31,61,.55);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:18px;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.tesla-overlay.show{opacity:1;pointer-events:auto}
+.tesla-detail{
+  background:#fff;width:100%;max-width:440px;max-height:90vh;
+  border-radius:var(--r-xl);
+  border:3px solid var(--blue-border);
+  box-shadow:0 10px 0 var(--blue-border), 0 20px 50px rgba(15,31,61,.4);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:scale(.94) translateY(12px);
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1);
+}
+.tesla-overlay.show .tesla-detail{transform:scale(1) translateY(0)}
+
+.tesla-hero{
+  position:relative;padding:26px 20px 20px;
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);
+  color:#fff;text-align:center;flex-shrink:0;overflow:hidden;
+}
+.tesla-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.12)}
+.tesla-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.1)}
+.tesla-hero > *{position:relative;z-index:1}
+
+.tesla-avatar{
+  width:84px;height:84px;margin:0 auto 12px;border-radius:50%;
+  display:grid;place-items:center;font-size:36px;color:var(--blue);
+  background:#fff;border:4px solid rgba(255,255,255,.5);
+  box-shadow:0 4px 0 rgba(0,0,0,.15);transform:rotate(-4deg);
+}
+.tesla-hero h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
+.tesla-hero .tesla-title{font-size:11.5px;font-weight:700;opacity:.9;letter-spacing:.3px;margin-bottom:10px}
+.tesla-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.tesla-tag{
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:800;letter-spacing:.3px;
+  background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;
+}
+
+.tesla-close{
+  position:absolute;top:14px;right:14px;z-index:3;
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;font-size:15px;color:#fff;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);
+  transition:transform .18s var(--ease);
+}
+.tesla-close:active{transform:scale(.9)}
+
+.tesla-body{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:20px 20px calc(24px + var(--safe-bottom));
+  font-size:13.5px;line-height:1.7;color:var(--text-2);
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.tesla-body::-webkit-scrollbar{display:none}
+.tesla-body h3{
+  font-size:12.5px;font-weight:800;color:var(--blue);
+  letter-spacing:.4px;text-transform:uppercase;
+  margin:18px 0 8px;display:flex;align-items:center;gap:8px;
+}
+.tesla-body h3:first-child{margin-top:0}
+.tesla-body h3 i{font-size:12px}
+.tesla-body p{margin-bottom:10px}
+
+.tesla-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+.tesla-fact{padding:10px 12px;border-radius:12px;background:#f1f5ff;border:2px solid var(--blue-soft)}
+.tesla-fact .lbl{font-size:9.5px;font-weight:800;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+.tesla-fact .val{font-size:12px;font-weight:800;color:var(--text);line-height:1.4}
+
+.tesla-list{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:7px}
+.tesla-list li{position:relative;padding-left:24px;font-size:12.5px;line-height:1.6}
+.tesla-list li::before{
+  content:'\f0e7';font-family:'Font Awesome 6 Free';font-weight:900;
+  position:absolute;left:4px;top:2px;color:var(--blue);font-size:10px;
+}
+
+.tesla-quote{
+  position:relative;padding:16px 18px 16px 42px;border-radius:14px;
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border:2.5px solid var(--amber-border);
+  margin:12px 0;font-size:12.5px;font-style:italic;
+  line-height:1.65;color:#78350f;font-weight:600;
+}
+.tesla-quote::before{
+  content:'\201C';position:absolute;top:6px;left:14px;
+  font-size:40px;line-height:1;color:var(--amber);
+  font-family:Georgia,serif;font-weight:900;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:360px){
+  .menu-card{padding:14px 12px;min-height:124px}
+  .mc-title{font-size:12.5px}
+  .mc-sub{font-size:11px}
+  .chat-empty h3{font-size:14px}
+  .coming-title{font-size:22px}
+  .coming-icon{width:110px;height:110px;font-size:48px}
+  .quiz-opts{padding-left:0}
+  .screen-points{padding:6px 9px;font-size:10px}
+  .screen-points b{font-size:12px}
+  .point-popup-inner{padding:20px 28px;min-width:190px}
+  .point-popup-pts{font-size:38px}
+  .point-popup-ico{font-size:44px}
+  .rumus-detail-body{font-size:13px;padding:20px 16px calc(20px + var(--safe-bottom))}
+  .rumus-detail-body .rumus-box{font-size:14px;padding:14px 12px}
+  .tesla-hero h2{font-size:19px}
+  .tesla-avatar{width:74px;height:74px;font-size:30px}
+}
+@media (min-width:520px){
+  .card-grid{gap:16px}
+  .menu-card{min-height:148px;padding:18px 16px}
+  .grid2{gap:16px}
+  .stage3d{aspect-ratio:16/11}
+}
+@media (max-height:680px){
+  .hero{padding:18px;margin-bottom:20px}
+  .hero h2{font-size:17px}
+  .stage3d{aspect-ratio:1/0.8}
+  .chat-empty .hero-ai{width:70px;height:70px;font-size:28px}
+  .chat-empty{gap:8px}
+  .coming-icon{width:100px;height:100px;font-size:42px;margin-bottom:18px}
+  .coming-title{font-size:22px}
+  .coming-sub{margin-bottom:20px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-bolt"></i></div>
+      <div>
+        <div class="brand-name">My<b>Fisika</b></div>
+        <div class="brand-sub">BELAJAR LISTRIK</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="btnReset3D" aria-label="Reset kamera 3D">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-view">
+
+    <!-- ================= HOME ================= -->
+    <section class="tab-panel active" id="tab-home">
+      <div class="scroll">
+
+        <div class="viewer-card">
+          <div class="stage3d" id="stage3d">
+            <div class="stage-corner tl"></div>
+            <div class="stage-corner tr"></div>
+            <div class="stage-corner bl"></div>
+            <div class="stage-corner br"></div>
+
+            <canvas id="canvas3d"></canvas>
+
+            <div class="stage-tag"><span class="pulse"></span>3D Nikola Tesla</div>
+
+            <div class="stage-fallback" id="fb3d">
+              <div class="fb-ico"><i class="fa-solid fa-bolt"></i></div>
+              <b>Model 3D belum dimuat</b>
+              <span>Letakkan file <code>listrik.glb</code> di folder yang sama dengan file ini.</span>
+            </div>
+
+            <div class="stage-load" id="load3d">
+              <div class="ring"></div>
+              <span>Memuat model 3D…</span>
+            </div>
+
+            <div class="stage-hint" id="hint3d">
+              <i class="fa-solid fa-hand-pointer"></i>Geser: putar · Ketuk: biografi
+            </div>
+          </div>
+        </div>
+
+        <div class="hero">
+          <i class="fa-solid fa-bolt hero-ico"></i>
+          <h2>Nikola Tesla</h2>
+          <p>"Saya tidak peduli mereka mencuri ide saya... Saya peduli mereka tidak punya ide sendiri."</p>
+        </div>
+
+        <div class="card-grid">
+          <div class="menu-card" data-href="alur-listrik.html">
+            <div class="mc-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="mc-title">Alur Listrik</div>
+            <div class="mc-sub">Rangkaian tertutup &amp; terbuka</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-href="beda-potensial.html">
+            <div class="mc-icon purple"><i class="fa-solid fa-battery-full"></i></div>
+            <div class="mc-title">Beda Potensial</div>
+            <div class="mc-sub">Tegangan &amp; sumber listrik</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-href="hambatan-listrik.html">
+            <div class="mc-icon teal"><i class="fa-solid fa-hand"></i></div>
+            <div class="mc-title">Hambatan Listrik</div>
+            <div class="mc-sub">Resistor &amp; faktor pengaruhnya</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-href="hukum-ohm.html">
+            <div class="mc-icon amber"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="mc-title">Hukum Ohm</div>
+            <div class="mc-sub">Hubungan V, I dan R</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-href="rangkaian-seri.html">
+            <div class="mc-icon pink"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+            <div class="mc-title">Rangkaian Seri</div>
+            <div class="mc-sub">Komponen berurutan satu jalur</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-href="rangkaian-paralel.html">
+            <div class="mc-icon indigo"><i class="fa-solid fa-code-branch"></i></div>
+            <div class="mc-title">Rangkaian Paralel</div>
+            <div class="mc-sub">Komponen bercabang</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SOAL -->
+    <section class="tab-panel" id="tab-belajar">
+      <div class="chips" id="materiChips">
+        <button class="chip active" data-filter="all"><i class="fa-solid fa-layer-group"></i>Semua</button>
+        <button class="chip" data-filter="dasar"><i class="fa-solid fa-bolt"></i>Dasar</button>
+        <button class="chip" data-filter="hukum"><i class="fa-solid fa-square-root-variable"></i>Hukum</button>
+        <button class="chip" data-filter="rangkaian"><i class="fa-solid fa-code-branch"></i>Rangkaian</button>
+      </div>
+      <div class="scroll">
+        <div class="card-grid" id="materiGrid" style="margin-bottom:0">
+          <div class="menu-card" data-target="scr-alur" data-category="dasar">
+            <div class="mc-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="mc-title">Alur Listrik</div>
+            <div class="mc-sub">Rangkaian tertutup &amp; terbuka</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-potensial" data-category="dasar">
+            <div class="mc-icon purple"><i class="fa-solid fa-battery-full"></i></div>
+            <div class="mc-title">Beda Potensial</div>
+            <div class="mc-sub">Tegangan &amp; sumber listrik</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-hambatan" data-category="dasar">
+            <div class="mc-icon teal"><i class="fa-solid fa-hand"></i></div>
+            <div class="mc-title">Hambatan Listrik</div>
+            <div class="mc-sub">Resistor &amp; faktor pengaruhnya</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-ohm" data-category="hukum">
+            <div class="mc-icon amber"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="mc-title">Hukum Ohm</div>
+            <div class="mc-sub">Hubungan V, I dan R</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-seri" data-category="rangkaian">
+            <div class="mc-icon pink"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+            <div class="mc-title">Rangkaian Seri</div>
+            <div class="mc-sub">Komponen berurutan satu jalur</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-paralel" data-category="rangkaian">
+            <div class="mc-icon indigo"><i class="fa-solid fa-code-branch"></i></div>
+            <div class="mc-title">Rangkaian Paralel</div>
+            <div class="mc-sub">Komponen bercabang</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-daya" data-category="hukum">
+            <div class="mc-icon orange"><i class="fa-solid fa-bolt"></i></div>
+            <div class="mc-title">Daya Listrik</div>
+            <div class="mc-sub">P = V · I dan penerapannya</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-energi" data-category="hukum">
+            <div class="mc-icon amber"><i class="fa-solid fa-fire"></i></div>
+            <div class="mc-title">Energi Listrik</div>
+            <div class="mc-sub">W = P · t &amp; kWh</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-kirchhoff" data-category="hukum">
+            <div class="mc-icon orange"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+            <div class="mc-title">Hukum Kirchhoff</div>
+            <div class="mc-sub">ΣI masuk = ΣI keluar</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+          <div class="menu-card" data-target="scr-daya-hambatan" data-category="hukum">
+            <div class="mc-icon purple"><i class="fa-solid fa-plug"></i></div>
+            <div class="mc-title">Daya Hambatan</div>
+            <div class="mc-sub">P = I² · R</div>
+            <span class="mc-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= AI CHAT ================= -->
+    <section class="tab-panel" id="tab-ar">
+      <div class="chat-wrap">
+
+        <div class="chat-body" id="chatBody">
+          <div class="chat-empty" id="chatEmpty">
+            <div class="hero-ai"><i class="fa-solid fa-robot"></i></div>
+            <h3>Hai, aku Nara AI</h3>
+            <p>Asisten fisika yang siap bantu kamu — hukum Ohm, rangkaian seri/paralel, rumus, atau materi listrik lainnya.</p>
+            <div class="sugg">
+              <button data-q="Apa itu Hukum Ohm?"><i class="fa-solid fa-scale-balanced"></i>Hukum Ohm</button>
+              <button data-q="Jelaskan rangkaian seri"><i class="fa-solid fa-arrow-right-arrow-left"></i>Rangkaian Seri</button>
+              <button data-q="Apa beda potensial itu?"><i class="fa-solid fa-battery-full"></i>Beda Potensial</button>
+              <button data-q="Apa itu hambatan listrik?"><i class="fa-solid fa-hand"></i>Hambatan</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <textarea id="chatText" rows="1" placeholder="Tanya tentang listrik…"></textarea>
+          <button class="chat-send" id="chatSend" aria-label="Kirim">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MATERI -->
+    <section class="tab-panel" id="tab-koleksi">
+      <div class="scroll">
+        <div class="hero" style="margin-bottom:22px">
+          <i class="fa-solid fa-book-open hero-ico"></i>
+          <h2>Materi Listrik ⚡</h2>
+          <p>Ketuk setiap kartu untuk membaca materi lengkap: konsep dasar, rumus, contoh soal, penerapan sehari-hari, miskonsepsi, fakta menarik, dan tips.</p>
+        </div>
+
+        <div class="grid2" id="rumusGrid">
+          <div class="coll" data-rumus="kuat-arus">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-water"></i></div>
+            <div class="coll-name">Kuat Arus</div>
+            <div class="coll-latin">I = Q / t</div>
+          </div>
+          <div class="coll" data-rumus="beda-potensial">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-battery-full"></i></div>
+            <div class="coll-name">Beda Potensial</div>
+            <div class="coll-latin">V = W / Q</div>
+          </div>
+          <div class="coll" data-rumus="hambatan">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-hand"></i></div>
+            <div class="coll-name">Hambatan</div>
+            <div class="coll-latin">R = ρ·L / A</div>
+          </div>
+          <div class="coll" data-rumus="hukum-ohm">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="coll-name">Hukum Ohm</div>
+            <div class="coll-latin">V = I · R</div>
+          </div>
+          <div class="coll" data-rumus="seri">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+            <div class="coll-name">Seri</div>
+            <div class="coll-latin">Rs = R₁ + R₂ + …</div>
+          </div>
+          <div class="coll" data-rumus="paralel">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-code-branch"></i></div>
+            <div class="coll-name">Paralel</div>
+            <div class="coll-latin">1/Rp = 1/R₁ + 1/R₂</div>
+          </div>
+          <div class="coll" data-rumus="daya">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-bolt"></i></div>
+            <div class="coll-name">Daya Listrik</div>
+            <div class="coll-latin">P = V · I</div>
+          </div>
+          <div class="coll" data-rumus="energi">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-fire"></i></div>
+            <div class="coll-name">Energi Listrik</div>
+            <div class="coll-latin">W = P · t</div>
+          </div>
+          <div class="coll" data-rumus="kirchhoff">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+            <div class="coll-name">Kirchhoff</div>
+            <div class="coll-latin">ΣI masuk = ΣI keluar</div>
+          </div>
+          <div class="coll" data-rumus="daya-hambatan">
+            <span class="badge"><i class="fa-solid fa-book-open"></i></span>
+            <div class="coll-ico"><i class="fa-solid fa-plug"></i></div>
+            <div class="coll-name">Daya Hambatan</div>
+            <div class="coll-latin">P = I² · R</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFIL -->
+    <section class="tab-panel" id="tab-profil">
+      <div class="scroll">
+        <div class="profile">
+          <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+          <div class="p-name">Fisikawan Muda</div>
+          <div class="p-mail">fisikawan@myfisika.id</div>
+          <div class="p-stats">
+            <div><b>10</b><span>Rumus</span></div>
+            <div><b>10</b><span>Soal</span></div>
+            <div><b id="totalPointsProfile">0</b><span>Poin</span></div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon amber"><i class="fa-solid fa-trophy"></i></div>
+            <div class="mc-title">Pencapaian</div>
+          </div>
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="mc-title">Statistik Belajar</div>
+          </div>
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon pink"><i class="fa-solid fa-star"></i></div>
+            <div class="mc-title">Favorit</div>
+          </div>
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon purple"><i class="fa-solid fa-bell"></i></div>
+            <div class="mc-title">Notifikasi</div>
+          </div>
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon teal"><i class="fa-solid fa-gear"></i></div>
+            <div class="mc-title">Pengaturan</div>
+          </div>
+          <div class="menu-card" style="min-height:104px">
+            <div class="mc-icon indigo"><i class="fa-solid fa-circle-question"></i></div>
+            <div class="mc-title">Bantuan &amp; Dukungan</div>
+          </div>
+        </div>
+
+        <button class="danger" id="btnResetPoints">
+          <i class="fa-solid fa-rotate-left"></i>Reset Total Poin
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ NAVBAR ============ -->
+  <nav class="nav">
+    <button class="nav-btn active" data-tab="tab-home">
+      <i class="fa-solid fa-house"></i><span>Beranda</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-koleksi">
+      <i class="fa-solid fa-book-open"></i><span>Materi</span>
+    </button>
+    <button class="nav-btn nav-ar" data-tab="tab-ar">
+      <div class="ar-fab"><i class="fa-solid fa-robot"></i></div>
+      <span>AI</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-belajar">
+      <i class="fa-solid fa-pen-to-square"></i><span>Soal</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-profil">
+      <i class="fa-solid fa-user"></i><span>Profil</span>
+    </button>
+  </nav>
+
+  <!-- SCREEN 1 : ALUR LISTRIK -->
+  <div class="screen" id="scr-alur">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Alur Listrik</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <b>Uji Pemahamanmu ⚡</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">1</span>Arus listrik mengalir dari titik berpotensial...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Rendah ke tinggi</button>
+            <button data-opt="b"><span class="opt-key">B</span>Tinggi ke rendah</button>
+            <button data-opt="c"><span class="opt-key">C</span>Sama ke sama</button>
+            <button data-opt="d"><span class="opt-key">D</span>Acak tanpa pola</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">2</span>Satuan kuat arus listrik dalam SI adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Ampere (A)</button>
+            <button data-opt="b"><span class="opt-key">B</span>Volt (V)</button>
+            <button data-opt="c"><span class="opt-key">C</span>Ohm (Ω)</button>
+            <button data-opt="d"><span class="opt-key">D</span>Watt (W)</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">3</span>Jika muatan 60 C mengalir dalam 20 sekon, kuat arusnya adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>0,3 A</button>
+            <button data-opt="b"><span class="opt-key">B</span>30 A</button>
+            <button data-opt="c"><span class="opt-key">C</span>3 A</button>
+            <button data-opt="d"><span class="opt-key">D</span>12 A</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">4</span>Rangkaian listrik disebut tertutup jika...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Saklar dalam posisi OFF</button>
+            <button data-opt="b"><span class="opt-key">B</span>Jalur arus tidak terputus</button>
+            <button data-opt="c"><span class="opt-key">C</span>Lampu dalam keadaan mati</button>
+            <button data-opt="d"><span class="opt-key">D</span>Kabel terlepas dari sumber</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">5</span>Arah arus konvensional berlawanan dengan arah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Kutub positif</button>
+            <button data-opt="b"><span class="opt-key">B</span>Kuat arus</button>
+            <button data-opt="c"><span class="opt-key">C</span>Tegangan</button>
+            <button data-opt="d"><span class="opt-key">D</span>Aliran elektron</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 : BEDA POTENSIAL -->
+  <div class="screen" id="scr-potensial">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Beda Potensial</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico purple"><i class="fa-solid fa-battery-full"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🔋</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">1</span>Satuan beda potensial dalam SI adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Ampere</button>
+            <button data-opt="b"><span class="opt-key">B</span>Ohm</button>
+            <button data-opt="c"><span class="opt-key">C</span>Volt</button>
+            <button data-opt="d"><span class="opt-key">D</span>Joule</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">2</span>Jika W = 120 J dan Q = 6 C, beda potensialnya adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>720 V</button>
+            <button data-opt="b"><span class="opt-key">B</span>20 V</button>
+            <button data-opt="c"><span class="opt-key">C</span>0,05 V</button>
+            <button data-opt="d"><span class="opt-key">D</span>12 V</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">3</span>Sumber beda potensial yang mengubah energi kimia → listrik adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Baterai</button>
+            <button data-opt="b"><span class="opt-key">B</span>Generator</button>
+            <button data-opt="c"><span class="opt-key">C</span>Sel surya</button>
+            <button data-opt="d"><span class="opt-key">D</span>Dinamo</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">4</span>Alat untuk mengukur beda potensial adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Amperemeter</button>
+            <button data-opt="b"><span class="opt-key">B</span>Voltmeter</button>
+            <button data-opt="c"><span class="opt-key">C</span>Ohmmeter</button>
+            <button data-opt="d"><span class="opt-key">D</span>Termometer</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">5</span>Jika dua titik memiliki potensial sama, maka arus yang mengalir...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Sangat besar</button>
+            <button data-opt="b"><span class="opt-key">B</span>Tetap</button>
+            <button data-opt="c"><span class="opt-key">C</span>Bolak-balik</button>
+            <button data-opt="d"><span class="opt-key">D</span>Tidak ada</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 : HAMBATAN -->
+  <div class="screen" id="scr-hambatan">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Hambatan Listrik</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico"><i class="fa-solid fa-hand"></i></div>
+        <div>
+          <b>Uji Pemahamanmu ✋</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">1</span>Satuan hambatan listrik dalam SI adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Ohm (Ω)</button>
+            <button data-opt="b"><span class="opt-key">B</span>Volt (V)</button>
+            <button data-opt="c"><span class="opt-key">C</span>Ampere (A)</button>
+            <button data-opt="d"><span class="opt-key">D</span>Watt (W)</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">2</span>Jika panjang kawat diperbesar 2 kali (faktor lain tetap), hambatan menjadi...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>½ kali</button>
+            <button data-opt="b"><span class="opt-key">B</span>2 kali</button>
+            <button data-opt="c"><span class="opt-key">C</span>4 kali</button>
+            <button data-opt="d"><span class="opt-key">D</span>Tetap</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">3</span>Berikut yang BUKAN faktor mempengaruhi hambatan kawat adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Panjang kawat</button>
+            <button data-opt="b"><span class="opt-key">B</span>Suhu</button>
+            <button data-opt="c"><span class="opt-key">C</span>Luas penampang</button>
+            <button data-opt="d"><span class="opt-key">D</span>Warna kawat</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">4</span>Bahan berikut yang paling baik sebagai konduktor adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Plastik</button>
+            <button data-opt="b"><span class="opt-key">B</span>Karet</button>
+            <button data-opt="c"><span class="opt-key">C</span>Tembaga</button>
+            <button data-opt="d"><span class="opt-key">D</span>Kayu</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">5</span>Makin besar luas penampang kawat, hambatannya...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Makin besar</button>
+            <button data-opt="b"><span class="opt-key">B</span>Makin kecil</button>
+            <button data-opt="c"><span class="opt-key">C</span>Tetap</button>
+            <button data-opt="d"><span class="opt-key">D</span>Tidak menentu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 : HUKUM OHM -->
+  <div class="screen" id="scr-ohm">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Hukum Ohm</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico amber"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div>
+          <b>Uji Pemahamanmu ⚖️</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">1</span>Bunyi Hukum Ohm menyatakan kuat arus sebanding dengan...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Beda potensial</button>
+            <button data-opt="b"><span class="opt-key">B</span>Hambatan</button>
+            <button data-opt="c"><span class="opt-key">C</span>Suhu</button>
+            <button data-opt="d"><span class="opt-key">D</span>Waktu</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">2</span>Jika V = 12 V dan R = 4 Ω, maka kuat arusnya adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>48 A</button>
+            <button data-opt="b"><span class="opt-key">B</span>3 A</button>
+            <button data-opt="c"><span class="opt-key">C</span>0,33 A</button>
+            <button data-opt="d"><span class="opt-key">D</span>8 A</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">3</span>Jika V = 6 V dan I = 2 A, maka hambatannya adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>12 Ω</button>
+            <button data-opt="b"><span class="opt-key">B</span>0,33 Ω</button>
+            <button data-opt="c"><span class="opt-key">C</span>3 Ω</button>
+            <button data-opt="d"><span class="opt-key">D</span>8 Ω</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">4</span>Jika hambatan tetap dan tegangan diperbesar 2 kali, arusnya menjadi...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>2 kali</button>
+            <button data-opt="b"><span class="opt-key">B</span>½ kali</button>
+            <button data-opt="c"><span class="opt-key">C</span>Tetap</button>
+            <button data-opt="d"><span class="opt-key">D</span>4 kali</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">5</span>Rumus Hukum Ohm yang benar adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>I = V × R</button>
+            <button data-opt="b"><span class="opt-key">B</span>R = V × I</button>
+            <button data-opt="c"><span class="opt-key">C</span>V = I ÷ R</button>
+            <button data-opt="d"><span class="opt-key">D</span>V = I × R</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5 : RANGKAIAN SERI -->
+  <div class="screen" id="scr-seri">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Rangkaian Seri</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico pink"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🔗</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">1</span>Ciri utama rangkaian seri adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Komponen bercabang</button>
+            <button data-opt="b"><span class="opt-key">B</span>Komponen disusun satu jalur</button>
+            <button data-opt="c"><span class="opt-key">C</span>Tegangan sama di tiap titik</button>
+            <button data-opt="d"><span class="opt-key">D</span>Arus berbeda di tiap titik</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">2</span>Jika R₁ = 4 Ω dan R₂ = 6 Ω disusun seri, hambatan totalnya...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>2,4 Ω</button>
+            <button data-opt="b"><span class="opt-key">B</span>10 Ω</button>
+            <button data-opt="c"><span class="opt-key">C</span>24 Ω</button>
+            <button data-opt="d"><span class="opt-key">D</span>5 Ω</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">3</span>Pada rangkaian seri, besar arus di setiap titik adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Sama</button>
+            <button data-opt="b"><span class="opt-key">B</span>Berbeda</button>
+            <button data-opt="c"><span class="opt-key">C</span>Berkurang</button>
+            <button data-opt="d"><span class="opt-key">D</span>Bertambah</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">4</span>Jika salah satu komponen pada rangkaian seri putus, maka...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Hanya itu yang mati</button>
+            <button data-opt="b"><span class="opt-key">B</span>Yang lain makin terang</button>
+            <button data-opt="c"><span class="opt-key">C</span>Arus bertambah</button>
+            <button data-opt="d"><span class="opt-key">D</span>Semua komponen mati</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">5</span>Rumus hambatan total rangkaian seri adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Rs = R₁ + R₂ + …</button>
+            <button data-opt="b"><span class="opt-key">B</span>1/Rs = 1/R₁ + 1/R₂</button>
+            <button data-opt="c"><span class="opt-key">C</span>Rs = R₁ × R₂</button>
+            <button data-opt="d"><span class="opt-key">D</span>Rs = R₁ ÷ R₂</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6 : RANGKAIAN PARALEL -->
+  <div class="screen" id="scr-paralel">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Rangkaian Paralel</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico indigo"><i class="fa-solid fa-code-branch"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🌿</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">1</span>Ciri utama rangkaian paralel adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Komponen bercabang</button>
+            <button data-opt="b"><span class="opt-key">B</span>Disusun satu jalur</button>
+            <button data-opt="c"><span class="opt-key">C</span>Arus sama di setiap titik</button>
+            <button data-opt="d"><span class="opt-key">D</span>Tegangan berbeda tiap cabang</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">2</span>Hambatan total dari R₁ = 6 Ω dan R₂ = 3 Ω yang disusun paralel adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>9 Ω</button>
+            <button data-opt="b"><span class="opt-key">B</span>4,5 Ω</button>
+            <button data-opt="c"><span class="opt-key">C</span>2 Ω</button>
+            <button data-opt="d"><span class="opt-key">D</span>18 Ω</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">3</span>Pada rangkaian paralel, tegangan setiap cabang...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Berbeda</button>
+            <button data-opt="b"><span class="opt-key">B</span>Sama</button>
+            <button data-opt="c"><span class="opt-key">C</span>Berkurang</button>
+            <button data-opt="d"><span class="opt-key">D</span>Bertambah</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">4</span>Keunggulan rangkaian paralel adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Jika satu mati, lain tetap hidup</button>
+            <button data-opt="b"><span class="opt-key">B</span>Lebih hemat kabel</button>
+            <button data-opt="c"><span class="opt-key">C</span>Arusnya kecil</button>
+            <button data-opt="d"><span class="opt-key">D</span>Lebih sederhana</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">5</span>Hambatan total rangkaian paralel selalu...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Lebih besar dari hambatan terbesar</button>
+            <button data-opt="b"><span class="opt-key">B</span>Sama dengan hambatan terbesar</button>
+            <button data-opt="c"><span class="opt-key">C</span>Sama dengan hambatan terkecil</button>
+            <button data-opt="d"><span class="opt-key">D</span>Lebih kecil dari hambatan terkecil</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 7 : DAYA LISTRIK -->
+  <div class="screen" id="scr-daya">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Daya Listrik</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico orange"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 💡</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">1</span>Satuan daya listrik dalam SI adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Joule (J)</button>
+            <button data-opt="b"><span class="opt-key">B</span>Volt (V)</button>
+            <button data-opt="c"><span class="opt-key">C</span>Watt (W)</button>
+            <button data-opt="d"><span class="opt-key">D</span>Ampere (A)</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">2</span>Lampu dialiri arus 0,5 A pada tegangan 220 V. Berapa dayanya?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>440 W</button>
+            <button data-opt="b"><span class="opt-key">B</span>110 W</button>
+            <button data-opt="c"><span class="opt-key">C</span>0,002 W</button>
+            <button data-opt="d"><span class="opt-key">D</span>220 W</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">3</span>Alat bertegangan 220 V dengan hambatan 44 Ω. Berapa dayanya?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>44 W</button>
+            <button data-opt="b"><span class="opt-key">B</span>220 W</button>
+            <button data-opt="c"><span class="opt-key">C</span>484 W</button>
+            <button data-opt="d"><span class="opt-key">D</span>1.100 W</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">4</span>Bentuk lain rumus daya listrik dari Hukum Ohm adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>P = I² · R</button>
+            <button data-opt="b"><span class="opt-key">B</span>P = V · R</button>
+            <button data-opt="c"><span class="opt-key">C</span>P = V / I</button>
+            <button data-opt="d"><span class="opt-key">D</span>P = I / R</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">5</span>Dibanding lampu pijar 40 W, lampu LED 5 W dengan terang sama lebih...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Boros listrik</button>
+            <button data-opt="b"><span class="opt-key">B</span>Hemat listrik</button>
+            <button data-opt="c"><span class="opt-key">C</span>Sama saja</button>
+            <button data-opt="d"><span class="opt-key">D</span>Lebih panas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 8 : ENERGI LISTRIK -->
+  <div class="screen" id="scr-energi">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Energi Listrik</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico amber"><i class="fa-solid fa-fire"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🔥</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">1</span>Satuan energi listrik dalam SI adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Watt (W)</button>
+            <button data-opt="b"><span class="opt-key">B</span>Joule (J)</button>
+            <button data-opt="c"><span class="opt-key">C</span>Volt (V)</button>
+            <button data-opt="d"><span class="opt-key">D</span>Ampere (A)</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">2</span>Lampu 100 W menyala 5 jam. Berapa energi listriknya?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>500 J</button>
+            <button data-opt="b"><span class="opt-key">B</span>1,8 × 10⁴ J</button>
+            <button data-opt="c"><span class="opt-key">C</span>1,8 × 10⁶ J</button>
+            <button data-opt="d"><span class="opt-key">D</span>3,6 × 10⁶ J</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">3</span>Setrika 300 W dipakai 2 jam sehari selama 30 hari. Berapa kWh?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>18 kWh</button>
+            <button data-opt="b"><span class="opt-key">B</span>60 kWh</button>
+            <button data-opt="c"><span class="opt-key">C</span>9 kWh</button>
+            <button data-opt="d"><span class="opt-key">D</span>36 kWh</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">4</span>Konversi 1 kWh sama dengan...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>1.000 J</button>
+            <button data-opt="b"><span class="opt-key">B</span>10.000 J</button>
+            <button data-opt="c"><span class="opt-key">C</span>36.000 J</button>
+            <button data-opt="d"><span class="opt-key">D</span>3,6 × 10⁶ J</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">5</span>Rumus energi listrik yang benar adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>W = P / t</button>
+            <button data-opt="b"><span class="opt-key">B</span>W = P · t</button>
+            <button data-opt="c"><span class="opt-key">C</span>W = V / I</button>
+            <button data-opt="d"><span class="opt-key">D</span>W = I · R</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 9 : HUKUM KIRCHHOFF -->
+  <div class="screen" id="scr-kirchhoff">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Hukum Kirchhoff</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico orange"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🔌</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">1</span>Bunyi Hukum I Kirchhoff adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>ΣI masuk = ΣI keluar</button>
+            <button data-opt="b"><span class="opt-key">B</span>V = I · R</button>
+            <button data-opt="c"><span class="opt-key">C</span>P = V · I</button>
+            <button data-opt="d"><span class="opt-key">D</span>W = P · t</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">2</span>Arus masuk ke titik cabang 5 A. Jika I₁ = 2 A dan I₂ = 1 A, maka I₃ = ...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>1 A</button>
+            <button data-opt="b"><span class="opt-key">B</span>3 A</button>
+            <button data-opt="c"><span class="opt-key">C</span>2 A</button>
+            <button data-opt="d"><span class="opt-key">D</span>5 A</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">3</span>Hukum II Kirchhoff menyatakan bahwa dalam loop tertutup berlaku...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>ΣI masuk = ΣI keluar</button>
+            <button data-opt="b"><span class="opt-key">B</span>ΣE = ΣI · R</button>
+            <button data-opt="c"><span class="opt-key">C</span>P = I² · R</button>
+            <button data-opt="d"><span class="opt-key">D</span>R = ρ · L / A</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">4</span>Hukum I Kirchhoff adalah bentuk hukum kekekalan...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Energi</button>
+            <button data-opt="b"><span class="opt-key">B</span>Momentum</button>
+            <button data-opt="c"><span class="opt-key">C</span>Massa</button>
+            <button data-opt="d"><span class="opt-key">D</span>Muatan listrik</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">5</span>Dua arus masuk 3 A dan 2 A, satu arus keluar 4 A. Berapa arus keluar lainnya?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>1 A</button>
+            <button data-opt="b"><span class="opt-key">B</span>2 A</button>
+            <button data-opt="c"><span class="opt-key">C</span>3 A</button>
+            <button data-opt="d"><span class="opt-key">D</span>5 A</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 10 : DAYA PADA HAMBATAN -->
+  <div class="screen" id="scr-daya-hambatan">
+    <div class="screen-head">
+      <button class="back" data-back><i class="fa-solid fa-chevron-left"></i></button>
+      <div>
+        <h1>Daya pada Hambatan</h1>
+        <p>Latihan Soal · 5 Pertanyaan</p>
+      </div>
+      <div class="screen-points"><i class="fa-solid fa-star"></i><b data-total-points>0</b></div>
+    </div>
+    <div class="screen-body">
+      <div class="quiz-banner">
+        <div class="qb-ico purple"><i class="fa-solid fa-plug"></i></div>
+        <div>
+          <b>Uji Pemahamanmu 🔥</b>
+          <span>Jawab 5 soal berikut. Setiap jawaban benar bernilai <b>20 poin</b>.</span>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-head">
+          <span class="bullet"><i class="fa-solid fa-pen-to-square"></i></span>
+          Latihan Soal
+          <span class="quiz-score" data-score><i class="fa-solid fa-star"></i>0/5 · Nilai 0</span>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">1</span>Arus 2 A melewati hambatan 5 Ω. Berapa daya pada hambatan?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>10 W</button>
+            <button data-opt="b"><span class="opt-key">B</span>20 W</button>
+            <button data-opt="c"><span class="opt-key">C</span>40 W</button>
+            <button data-opt="d"><span class="opt-key">D</span>100 W</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="c">
+          <div class="quiz-q"><span class="q-num">2</span>Kawat hambatan 4 Ω dipasang pada tegangan 12 V. Berapa panas yang dihasilkan?</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>12 W</button>
+            <button data-opt="b"><span class="opt-key">B</span>24 W</button>
+            <button data-opt="c"><span class="opt-key">C</span>36 W</button>
+            <button data-opt="d"><span class="opt-key">D</span>48 W</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="a">
+          <div class="quiz-q"><span class="q-num">3</span>Bentuk lain dari P = I² · R adalah...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>P = V² / R</button>
+            <button data-opt="b"><span class="opt-key">B</span>P = V / R²</button>
+            <button data-opt="c"><span class="opt-key">C</span>P = V · R²</button>
+            <button data-opt="d"><span class="opt-key">D</span>P = V² · R</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="d">
+          <div class="quiz-q"><span class="q-num">4</span>Prinsip kerja setrika, solder, dan pemanas air memanfaatkan...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>Gaya magnet</button>
+            <button data-opt="b"><span class="opt-key">B</span>Induksi elektromagnetik</button>
+            <button data-opt="c"><span class="opt-key">C</span>Reaksi kimia</button>
+            <button data-opt="d"><span class="opt-key">D</span>Daya pada hambatan (panas)</button>
+          </div>
+        </div>
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q"><span class="q-num">5</span>Jika kuat arus digandakan (hambatan tetap), daya pada hambatan menjadi...</div>
+          <div class="quiz-opts">
+            <button data-opt="a"><span class="opt-key">A</span>2 kali</button>
+            <button data-opt="b"><span class="opt-key">B</span>4 kali</button>
+            <button data-opt="c"><span class="opt-key">C</span>½ kali</button>
+            <button data-opt="d"><span class="opt-key">D</span>Tetap</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COMING SOON ================= -->
+  <div class="coming" id="comingSoon">
+    <button class="coming-back" id="comingBack" aria-label="Kembali">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <div class="coming-inner">
+      <div class="coming-icon" id="comingIcon"><i class="fa-solid fa-bolt"></i></div>
+
+      <div class="coming-badge"><span class="pulse"></span>SEGERA HADIR</div>
+
+      <h2 class="coming-title" id="comingTitle">Alur Listrik</h2>
+      <p class="coming-sub" id="comingSub">Materi ini sedang kami siapkan. Nantikan update berikutnya ya! ⚡</p>
+
+      <div class="coming-bar"><span></span></div>
+      <div class="coming-note">Materi sedang dikembangkan</div>
+
+      <button class="coming-btn" id="comingBtn">
+        <i class="fa-solid fa-house"></i>Kembali ke Beranda
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= TESLA BIOGRAPHY ================= -->
+  <div class="tesla-overlay" id="teslaOverlay">
+    <div class="tesla-detail">
+      <div class="tesla-hero">
+        <button class="tesla-close" id="teslaClose" aria-label="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="tesla-avatar"><i class="fa-solid fa-bolt"></i></div>
+        <h2>Nikola Tesla</h2>
+        <div class="tesla-title">1856 – 1943 · Penemu &amp; Insinyur Listrik</div>
+        <div class="tesla-tags">
+          <span class="tesla-tag">⚡ Arus AC</span>
+          <span class="tesla-tag">🔋 Tesla Coil</span>
+          <span class="tesla-tag">📡 Nirkabel</span>
+        </div>
+      </div>
+      <div class="tesla-body">
+        <h3><i class="fa-solid fa-id-card"></i>Profil Singkat</h3>
+        <div class="tesla-facts">
+          <div class="tesla-fact"><div class="lbl">Lahir</div><div class="val">10 Juli 1856</div></div>
+          <div class="tesla-fact"><div class="lbl">Meninggal</div><div class="val">7 Januari 1943</div></div>
+          <div class="tesla-fact"><div class="lbl">Asal</div><div class="val">Smiljan, Austria</div></div>
+          <div class="tesla-fact"><div class="lbl">Warga</div><div class="val">Serbia–Amerika</div></div>
+        </div>
+
+        <h3><i class="fa-solid fa-book-open"></i>Biografi</h3>
+        <p><b>Nikola Tesla</b> adalah penemu, insinyur listrik, dan fisikawan kelahiran Smiljan (kini Kroasia) yang berimigrasi ke Amerika Serikat pada 1884. Ia dikenal sebagai salah satu ilmuwan paling berpengaruh dalam sejarah kelistrikan modern.</p>
+        <p>Setelah sempat bekerja bersama <b>Thomas Edison</b>, Tesla mengembangkan sistem <b>arus bolak-balik (AC)</b> yang kemudian menjadi standar dunia. Bersama <b>George Westinghouse</b>, ia memenangkan "Perang Arus" melawan sistem DC Edison, dan membuktikan bahwa AC jauh lebih efisien untuk transmisi jarak jauh.</p>
+        <p>Sepanjang hidupnya, Tesla mendaftarkan lebih dari <b>300 paten</b> di berbagai negara. Meski kontribusinya luar biasa, ia meninggal dalam keadaan miskin di kamar hotel New York pada tahun 1943.</p>
+
+        <h3><i class="fa-solid fa-lightbulb"></i>Penemuan &amp; Kontribusi</h3>
+        <ul class="tesla-list">
+          <li><b>Motor Induksi AC</b> — dasar hampir semua motor listrik modern.</li>
+          <li><b>Sistem Tenaga AC</b> — mengalirkan listrik jarak jauh lewat PLTA Niagara Falls.</li>
+          <li><b>Tesla Coil</b> — kumparan tegangan tinggi; dasar radio &amp; teknologi nirkabel.</li>
+          <li><b>Transformator Tesla</b> — untuk menaikkan tegangan listrik.</li>
+          <li><b>Radio</b> — kontribusinya mendahului Marconi dalam transmisi nirkabel.</li>
+          <li><b>Kendali Jarak Jauh</b> — didemonstrasikan pertama kali pada perahu mainan (1898).</li>
+          <li><b>Sistem PLTA</b> — dipasang di PLTA Niagara Falls.</li>
+        </ul>
+
+        <h3><i class="fa-solid fa-quote-left"></i>Kata-Kata Terkenal</h3>
+        <div class="tesla-quote">"Saya tidak peduli mereka mencuri ide saya... Saya peduli mereka tidak punya ide sendiri."</div>
+        <div class="tesla-quote">"Jika ingin memahami alam semesta, pikirkan dalam istilah energi, frekuensi, dan getaran."</div>
+        <div class="tesla-quote">"Masa kini adalah milik mereka; masa depan, yang menjadi tujuan saya, adalah milik saya."</div>
+
+        <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+        <ul class="tesla-list">
+          <li>Satuan internasional untuk <b>induksi magnetik</b> dinamai <b>Tesla (T)</b> untuk menghormatinya.</li>
+          <li>Hanya tidur 2–3 jam sehari dan sering bekerja hingga larut malam.</li>
+          <li>Memiliki ingatan fotografis yang luar biasa.</li>
+          <li>Bisa berbicara 8 bahasa: Serbia, Inggris, Jerman, Prancis, Italia, Latin, Ceko, Hungaria.</li>
+          <li>Pada 1899, ia mengaku menerima sinyal dari luar angkasa di lab Colorado Springs.</li>
+          <li>Meninggal sendirian di Hotel New Yorker, kamar 3327.</li>
+        </ul>
+
+        <h3><i class="fa-solid fa-check-circle"></i>Warisan</h3>
+        <p>Nama Tesla kini diabadikan pada perusahaan mobil listrik, satuan ukur fisika, bandara Beograd, dan banyak museum. Karyanya menjadi fondasi sistem kelistrikan modern yang kita pakai setiap hari.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP POINT ================= -->
+  <div class="popup-backdrop" id="popupBackdrop"></div>
+  <div class="point-popup" id="pointPopup">
+    <div class="point-popup-inner" id="pointPopupInner">
+      <i class="fa-solid fa-star point-popup-ico" id="pointPopupIco"></i>
+      <div class="point-popup-pts" id="pointPopupPts">+20</div>
+      <div class="point-popup-label" id="pointPopupLabel">POIN DIDAPAT</div>
+      <div class="point-popup-total">
+        <i class="fa-solid fa-star"></i>Total: <b id="pointPopupTotal">20</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MATERI RUMUS OVERLAY ================= -->
+  <div class="rumus-overlay" id="rumusOverlay">
+    <div class="rumus-detail">
+      <div class="rumus-detail-head">
+        <div class="rumus-detail-ico" id="rumusDetailIco">
+          <i class="fa-solid fa-water"></i>
+        </div>
+        <div class="rumus-detail-title">
+          <h2 id="rumusDetailTitle">Kuat Arus Listrik</h2>
+          <p id="rumusDetailSub">I = Q / t</p>
+        </div>
+        <button class="rumus-close" id="rumusClose" aria-label="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rumus-detail-body" id="rumusDetailBody">
+        <!-- diisi JS -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+const MODEL_URL  = 'listrik.glb';
+const AUTO_SPIN  = true;
+const SPIN_SPEED = 1.6;
+const MODEL_SIZE = 1.6;
+const CAM_START  = { x:0, y:0.86, z:3.4 };
+
+(async () => {
+  const stageEl  = document.getElementById('stage3d');
+  const canvasEl = document.getElementById('canvas3d');
+  const loadEl   = document.getElementById('load3d');
+  const loadTxt  = loadEl.querySelector('span');
+  const fbEl     = document.getElementById('fb3d');
+  const fbTxt    = fbEl.querySelector('span');
+  const hintEl   = document.getElementById('hint3d');
+
+  function showFallback(html){
+    loadEl.classList.add('hide');
+    fbEl.classList.add('show');
+    if (html) fbTxt.innerHTML = html;
+    hintEl.classList.add('hide');
+  }
+
+  let THREE, OrbitControls, GLTFLoader;
+  try{
+    THREE = await import('three');
+    ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
+    ({ GLTFLoader }    = await import('three/addons/loaders/GLTFLoader.js'));
+  }catch(err){
+    showFallback('Library 3D gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
+    return;
+  }
+
+  let renderer;
+  try{
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvasEl, antialias:true, alpha:true,
+      powerPreference: 'high-performance'
+    });
+  }catch(e){
+    showFallback('Perangkat / browser ini tidak mendukung WebGL.');
+    return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.domElement.style.touchAction = 'none';
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  camera.position.set(CAM_START.x, CAM_START.y, CAM_START.z);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xcfe4ff, 2.1));
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
+  keyLight.position.set(3, 5, 4);
+  scene.add(keyLight);
+
+  const rimLight = new THREE.DirectionalLight(0x93c5fd, 1.3);
+  rimLight.position.set(-4, 2, -3);
+  scene.add(rimLight);
+
+  const fillLight = new THREE.DirectionalLight(0xfcd34d, 0.9);
+  fillLight.position.set(-2, -2, 3);
+  scene.add(fillLight);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping   = true;
+  controls.dampingFactor   = 0.08;
+  controls.enablePan       = false;
+  controls.minDistance     = 1.4;
+  controls.maxDistance     = 8;
+  controls.minPolarAngle   = Math.PI * 0.10;
+  controls.maxPolarAngle   = Math.PI * 0.90;
+  controls.autoRotate      = AUTO_SPIN;
+  controls.autoRotateSpeed = SPIN_SPEED;
+  controls.target.set(0, 0, 0);
+
+  function shadowTexture(){
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(128,128,0,128,128,128);
+    g.addColorStop(0,   'rgba(15,31,61,.30)');
+    g.addColorStop(.55, 'rgba(15,31,61,.12)');
+    g.addColorStop(1,   'rgba(15,31,61,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,256,256);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  const shadowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.9, 2.9),
+    new THREE.MeshBasicMaterial({
+      map: shadowTexture(), transparent: true, depthWrite: false
+    })
+  );
+  shadowPlane.rotation.x = -Math.PI / 2;
+  shadowPlane.position.y = -1.35;
+  scene.add(shadowPlane);
+
+  const pivot = new THREE.Group();
+  scene.add(pivot);
+
+  let mixer  = null;
+
+  const loader = new GLTFLoader();
+  loader.load(
+    MODEL_URL,
+    (gltf) => {
+      const model = gltf.scene;
+      model.traverse(o => {
+        if (o.isMesh) {
+          o.frustumCulled = false;
+          if (o.material) o.material.needsUpdate = true;
+        }
+      });
+      pivot.add(model);
+
+      const box    = new THREE.Box3().setFromObject(model);
+      const size   = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      pivot.scale.setScalar(MODEL_SIZE / maxDim);
+
+      if (gltf.animations && gltf.animations.length) {
+        mixer = new THREE.AnimationMixer(model);
+        gltf.animations.forEach(clip => mixer.clipAction(clip).play());
+      }
+
+      loadEl.classList.add('hide');
+      fbEl.classList.remove('show');
+    },
+    (evt) => {
+      if (evt && evt.total) {
+        const pct = Math.round((evt.loaded / evt.total) * 100);
+        loadTxt.textContent = `Memuat model… ${pct}%`;
+      }
+    },
+    () => {
+      showFallback(
+        'File <code>' + MODEL_URL + '</code> tidak ditemukan atau gagal dibaca. ' +
+        'Letakkan file GLB di folder yang sama dengan file HTML ini.'
+      );
+    }
+  );
+
+  function resize(){
+    const w = stageEl.clientWidth  || 1;
+    const h = stageEl.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stageEl);
+  else window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+
+  function homeActive(){
+    const el = document.getElementById('tab-home');
+    return el && el.classList.contains('active');
+  }
+
+  function animate(){
+    requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    if (mixer) mixer.update(dt);
+    controls.update();
+    if (homeActive()) renderer.render(scene, camera);
+  }
+  animate();
+
+  document.getElementById('btnReset3D').addEventListener('click', () => {
+    camera.position.set(CAM_START.x, CAM_START.y, CAM_START.z);
+    controls.target.set(0, 0, 0);
+    pivot.rotation.y = 0;
+    controls.update();
+    hintEl.classList.remove('hide');
+    setTimeout(() => hintEl.classList.add('hide'), 2500);
+  });
+
+  controls.addEventListener('start', () => hintEl.classList.add('hide'));
+  setTimeout(() => hintEl.classList.add('hide'), 7000);
+})();
+</script>
+
+<script>
+/* ============ NAVIGASI TAB ============ */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============ COMING SOON ============ */
+const comingEl    = document.getElementById('comingSoon');
+const comingIcon  = document.getElementById('comingIcon');
+const comingTitle = document.getElementById('comingTitle');
+const comingSub   = document.getElementById('comingSub');
+
+function openComing(card){
+  if (!card || !comingEl) return;
+
+  const title = card.querySelector('.mc-title')?.textContent?.trim() || 'Materi';
+  const iconEl = card.querySelector('.mc-icon');
+  const iconI  = iconEl?.querySelector('i');
+
+  const iconClass = iconI
+    ? (Array.from(iconI.classList).find(c => c.startsWith('fa-')) || 'fa-bolt')
+    : 'fa-bolt';
+
+  const tone = iconEl
+    ? (Array.from(iconEl.classList).find(c => c !== 'mc-icon') || '')
+    : '';
+
+  comingTitle.textContent = title;
+  comingSub.textContent = 'Materi "' + title + '" sedang kami siapkan. Nantikan update berikutnya ya! ⚡';
+  comingIcon.className = 'coming-icon' + (tone ? ' ' + tone : '');
+  comingIcon.innerHTML = '<i class="fa-solid ' + iconClass + '"></i>';
+
+  comingEl.classList.add('active');
+}
+
+function closeComing(){
+  if (comingEl) comingEl.classList.remove('active');
+}
+
+document.getElementById('comingBack')?.addEventListener('click', closeComing);
+document.getElementById('comingBtn')?.addEventListener('click', closeComing);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeComing();
+});
+
+/* ============ MENU CARD ============ */
+document.querySelectorAll('[data-target], [data-href]').forEach(el => {
+  el.addEventListener('click', () => {
+    const href = el.dataset.href;
+    if (href) { window.location.href = href; return; }
+
+    const target = el.dataset.target;
+    if (target) {
+      const scr = document.getElementById(target);
+      if (scr) { scr.classList.add('active'); return; }
+    }
+
+    openComing(el);
+  });
+});
+
+/* ============ TOMBOL BACK SCREEN ============ */
+document.querySelectorAll('[data-back]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.screen').classList.remove('active');
+  });
+});
+
+/* ============ CHIPS FILTER (Soal) ============ */
+const belajarPanel = document.getElementById('tab-belajar');
+
+function applyFilter(filter){
+  if (!belajarPanel) return;
+  belajarPanel.querySelectorAll('.menu-card').forEach(card => {
+    const cat = card.dataset.category || 'all';
+    const show = (filter === 'all' || cat === filter);
+    card.style.display = show ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('#materiChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#materiChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    applyFilter(chip.dataset.filter || 'all');
+  });
+});
+
+applyFilter('all');
+
+/* ============================================================
+   TOTAL POIN
+   ============================================================ */
+const POINT_PER_CORRECT = 20;
+let totalPoints = 0;
+
+const totalPointsProfileEl = document.getElementById('totalPointsProfile');
+
+function updateTotalPointsUI(bump){
+  if (totalPointsProfileEl) totalPointsProfileEl.textContent = totalPoints;
+  document.querySelectorAll('[data-total-points]').forEach(el => {
+    el.textContent = totalPoints;
+  });
+
+  if (bump){
+    document.querySelectorAll('.screen-points').forEach(sp => {
+      sp.classList.remove('bump');
+      void sp.offsetWidth;
+      sp.classList.add('bump');
+    });
+  }
+}
+
+function addPoints(n){
+  totalPoints += n;
+  updateTotalPointsUI(true);
+}
+
+document.getElementById('btnResetPoints')?.addEventListener('click', () => {
+  if (confirm('Reset total poin menjadi 0?')){
+    totalPoints = 0;
+    updateTotalPointsUI(false);
+  }
+});
+
+/* ============================================================
+   POPUP POINT
+   ============================================================ */
+const pointPopupEl       = document.getElementById('pointPopup');
+const pointPopupInnerEl  = document.getElementById('pointPopupInner');
+const pointPopupIcoEl    = document.getElementById('pointPopupIco');
+const pointPopupPtsEl    = document.getElementById('pointPopupPts');
+const pointPopupLabelEl  = document.getElementById('pointPopupLabel');
+const pointPopupTotalEl  = document.getElementById('pointPopupTotal');
+const popupBackdropEl    = document.getElementById('popupBackdrop');
+
+let popupTimer = null;
+
+function showPointPopup(correct){
+  pointPopupEl.querySelectorAll('.confetti').forEach(c => c.remove());
+  pointPopupInnerEl.classList.remove('wrong');
+
+  if (correct){
+    pointPopupIcoEl.className = 'fa-solid fa-star point-popup-ico';
+    pointPopupPtsEl.textContent = '+20';
+    pointPopupLabelEl.textContent = 'POIN DIDAPAT';
+  } else {
+    pointPopupInnerEl.classList.add('wrong');
+    pointPopupIcoEl.className = 'fa-solid fa-circle-xmark point-popup-ico';
+    pointPopupPtsEl.textContent = '+0';
+    pointPopupLabelEl.textContent = 'JAWABAN SALAH';
+  }
+  pointPopupTotalEl.textContent = totalPoints;
+
+  popupBackdropEl.classList.add('show');
+  pointPopupEl.classList.add('show');
+
+  if (correct) spawnConfetti();
+
+  clearTimeout(popupTimer);
+  popupTimer = setTimeout(() => {
+    pointPopupEl.classList.remove('show');
+    popupBackdropEl.classList.remove('show');
+  }, 1400);
+}
+
+function spawnConfetti(){
+  const emojis = ['⭐','✨','⚡','💫','🌟','🎉','🏆','💡'];
+  for (let i = 0; i < 12; i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.4;
+    const dist = 90 + Math.random() * 70;
+    c.style.setProperty('--cx', Math.cos(angle) * dist + 'px');
+    c.style.setProperty('--cy', Math.sin(angle) * dist + 'px');
+    c.style.animationDelay = (Math.random() * 0.15) + 's';
+    pointPopupEl.appendChild(c);
+  }
+}
+
+/* ============================================================
+   LATIHAN SOAL (QUIZ)
+   ============================================================ */
+document.querySelectorAll('.quiz').forEach(quiz => {
+  const items = quiz.querySelectorAll('.quiz-item');
+  const scoreEl = quiz.querySelector('[data-score]');
+  let score = 0;
+
+  quiz.querySelectorAll('.quiz-opts button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.quiz-item');
+      if (item.dataset.done) return;
+      item.dataset.done = '1';
+
+      const correct = item.dataset.answer;
+      const chosen  = btn.dataset.opt;
+      const allBtns = item.querySelectorAll('.quiz-opts button');
+
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.dataset.opt === correct) b.classList.add('correct');
+      });
+
+      if (chosen === correct) {
+        score++;
+        addPoints(POINT_PER_CORRECT);
+        showPointPopup(true);
+      } else {
+        btn.classList.add('wrong');
+        showPointPopup(false);
+      }
+
+      const nilai = Math.round((score / items.length) * 100);
+      scoreEl.innerHTML = '<i class="fa-solid fa-star"></i>' + score + '/' + items.length + ' · Nilai ' + nilai;
+
+      if (score === items.length) scoreEl.classList.add('perfect');
+    });
+  });
+});
+
+/* ============================================================
+   MATERI RUMUS — DATA
+   ============================================================ */
+const RUMUS_DATA = {
+  'kuat-arus': {
+    title: 'Kuat Arus Listrik',
+    sub: 'I = Q / t',
+    icon: 'fa-water',
+    tone: '',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Kuat arus listrik</b> adalah banyaknya muatan listrik yang mengalir melalui penampang penghantar setiap satuan waktu. Bayangkan arus listrik seperti aliran air di sungai: semakin banyak air yang lewat per detik, semakin "deras" arusnya.</p>
+      <p>Arus listrik terjadi karena adanya <b>beda potensial</b> yang mendorong elektron bergerak dari kutub negatif ke kutub positif. Namun <b>arus konvensional</b> (yang dipakai dalam rumus) dianggap mengalir dari kutub positif ke negatif — kebalikan dari arah gerak elektron.</p>
+      <p>Arus listrik dibedakan menjadi dua jenis:</p>
+      <ul>
+        <li><b>Arus searah (DC)</b> — arahnya tetap, contohnya baterai, aki, panel surya.</li>
+        <li><b>Arus bolak-balik (AC)</b> — arahnya berubah secara periodik, contohnya listrik PLN (50 Hz di Indonesia).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">I = Q / t</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain:</p>
+      <div class="rumus-box">Q = I · t &nbsp;&nbsp;|&nbsp;&nbsp; t = Q / I</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">I</span><span class="desc">Kuat arus listrik</span><span class="unit">Ampere (A)</span></div>
+        <div class="symbol-row"><span class="sym">Q</span><span class="desc">Muatan listrik</span><span class="unit">Coulomb (C)</span></div>
+        <div class="symbol-row"><span class="sym">t</span><span class="desc">Waktu</span><span class="unit">sekon (s)</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Muatan 60 C mengalir melalui kawat selama 20 sekon. Berapa kuat arusnya?<br>
+        <b>Jawab:</b> I = Q / t = 60 / 20 = <b>3 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Sebuah lampu dialiri arus 0,5 A selama 1 menit. Berapa muatan yang mengalir?<br>
+        <b>Jawab:</b> Q = I · t = 0,5 × 60 = <b>30 C</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Berapa lama waktu yang dibutuhkan untuk mengalirkan muatan 120 C pada arus 4 A?<br>
+        <b>Jawab:</b> t = Q / I = 120 / 4 = <b>30 s</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Konversi):</b> Sebuah charger mengalirkan arus 2 A selama 30 menit. Berapa muatan total?<br>
+        <b>Jawab:</b> t = 30 × 60 = 1800 s → Q = 2 × 1800 = <b>3600 C</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>MCB / sekring</b> di rumah dirancang memutus arus jika melebihi batas aman (misal 10 A).</li>
+        <li><b>Charger HP</b> menuliskan output arus (misal 5V 2A) — 2A menyatakan kuat arus yang disuplai.</li>
+        <li><b>Baterai kendaraan</b> punya kapasitas arus (misal 12V 60Ah) yang menunjukkan seberapa lama ia bisa memasok arus.</li>
+        <li><b>PLN rumah</b> membatasi arus lewat MCB (2A, 4A, 6A, 10A) sesuai daya terpasang.</li>
+        <li><b>Alat las listrik</b> memakai arus sangat besar (50–300 A) untuk melelehkan logam.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Arus listrik adalah elektron yang mengalir" → sebenarnya arus listrik adalah <b>muatan</b>, bukan elektron itu sendiri.</li>
+        <li>❌ "Arus listrik bisa mengalir di rangkaian terbuka" → arus butuh <b>jalur tertutup</b> agar mengalir.</li>
+        <li>❌ "Elektron bergerak sangat cepat" → kecepatan aliran elektron justru sangat lambat (drift), yang cepat adalah <b>sinyal listriknya</b>.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Di Indonesia, frekuensi listrik PLN adalah <b>50 Hz</b> — artinya arus berbalik arah 100 kali per detik!</li>
+        <li>Petir mengalirkan arus hingga <b>30.000 A</b> dalam waktu sangat singkat.</li>
+        <li>Arus listrik di dalam kabel bisa bergerak dengan kecepatan sinyal mendekati kecepatan cahaya, meski elektron fisiknya bergerak sangat pelan.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Ingat: <b>1 Ampere = 1 Coulomb per sekon</b>. Kalau soal memberi waktu dalam menit, ubah dulu ke detik (×60). Jika satuan muatan dalam mC (miliCoulomb), ubah ke C dengan dibagi 1000.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Muatan 480 C mengalir dalam 2 menit. Berapa kuat arusnya?</li>
+        <li>Arus 0,25 A mengalir selama 8 sekon. Berapa muatannya?</li>
+        <li>Berapa lama waktu untuk mengalirkan 900 C pada arus 5 A?</li>
+      </ul>
+    `
+  },
+
+  'beda-potensial': {
+    title: 'Beda Potensial',
+    sub: 'V = W / Q',
+    icon: 'fa-battery-full',
+    tone: 'purple',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Beda potensial</b> (tegangan listrik) adalah besarnya energi yang diperlukan untuk memindahkan satu satuan muatan listrik dari satu titik ke titik lain. Beda potensial ibarat "ketinggian" pada air: air mengalir dari tempat tinggi ke rendah, begitu juga muatan mengalir dari potensial tinggi ke rendah.</p>
+      <p>Tanpa beda potensial, <b>tidak akan ada arus listrik</b>. Itulah mengapa baterai, aki, dan generator disebut <b>sumber tegangan</b>.</p>
+      <p>Beda potensial bisa muncul dari berbagai sumber energi:</p>
+      <ul>
+        <li><b>Baterai/Aki</b> — dari energi kimia</li>
+        <li><b>Generator/Dinamo</b> — dari energi gerak (mekanik)</li>
+        <li><b>Sel surya</b> — dari energi cahaya</li>
+        <li><b>Termokopel</b> — dari perbedaan suhu</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">V = W / Q</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain:</p>
+      <div class="rumus-box">W = V · Q &nbsp;&nbsp;|&nbsp;&nbsp; Q = W / V</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">V</span><span class="desc">Beda potensial</span><span class="unit">Volt (V)</span></div>
+        <div class="symbol-row"><span class="sym">W</span><span class="desc">Usaha / energi</span><span class="unit">Joule (J)</span></div>
+        <div class="symbol-row"><span class="sym">Q</span><span class="desc">Muatan listrik</span><span class="unit">Coulomb (C)</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Untuk memindahkan muatan 6 C diperlukan energi 120 J. Berapa beda potensialnya?<br>
+        <b>Jawab:</b> V = W / Q = 120 / 6 = <b>20 V</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Sebuah baterai bertegangan 9 V mengalirkan muatan 4 C. Berapa energi yang dikeluarkan?<br>
+        <b>Jawab:</b> W = V · Q = 9 × 4 = <b>36 J</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Sumber 12 V melakukan usaha 240 J. Berapa muatan yang dipindahkan?<br>
+        <b>Jawab:</b> Q = W / V = 240 / 12 = <b>20 C</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Baterai seri):</b> Dua baterai 1,5 V disusun seri. Berapa tegangan totalnya?<br>
+        <b>Jawab:</b> V = 1,5 + 1,5 = <b>3 V</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Baterai 1,5 V</b> (AA/AAA) — untuk remot, jam dinding, mainan.</li>
+        <li><b>Baterai 9 V</b> — untuk detektor asap, radio kecil.</li>
+        <li><b>Aki 12 V</b> — digunakan pada mobil dan motor.</li>
+        <li><b>Listrik rumah 220 V</b> — tegangan standar PLN di Indonesia.</li>
+        <li><b>Power bank 5 V</b> — output USB standar untuk charger HP.</li>
+        <li><b>Generator</b> — mengubah energi gerak (kincir, turbin) menjadi beda potensial.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Tegangan adalah listrik" → tegangan hanya <b>potensi</b>, arusnya baru muncul saat rangkaian tertutup.</li>
+        <li>❌ "Tegangan bisa habis seperti baterai" → yang habis adalah <b>energi kimianya</b>, bukan tegangannya.</li>
+        <li>❌ "Voltmeter dipasang seri" → voltmeter dipasang <b>paralel</b>, amperemeter yang dipasang <b>seri</b>.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Tegangan listrik rumah di Indonesia 220 V, di Amerika 110 V, di Jepang 100 V — semua tetap aman karena alat dibuat sesuai standar masing-masing.</li>
+        <li>Sel saraf manusia menghasilkan tegangan kecil sekitar <b>70 mV</b> untuk mengirim sinyal ke otak.</li>
+        <li>Belut listrik bisa menghasilkan tegangan hingga <b>600 V</b> untuk melumpuhkan mangsanya.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Alat ukur beda potensial = <b>voltmeter</b>, dipasang <b>paralel</b> terhadap komponen yang diukur. Alat ukur arus = <b>amperemeter</b>, dipasang <b>seri</b>. Ingat: <b>1 V = 1 J/C</b>.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Untuk memindahkan muatan 15 C dibutuhkan energi 90 J. Berapa tegangannya?</li>
+        <li>Baterai 6 V memindahkan muatan 12 C. Berapa usahanya?</li>
+        <li>Empat baterai 1,5 V disusun seri. Berapa tegangan totalnya?</li>
+      </ul>
+    `
+  },
+
+  'hambatan': {
+    title: 'Hambatan Listrik',
+    sub: 'R = ρ · L / A',
+    icon: 'fa-hand',
+    tone: 'teal',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Hambatan listrik</b> adalah ukuran seberapa besar suatu bahan menghambat aliran arus listrik. Setiap bahan punya "tingkat kesulitan" tersendiri dalam melewatkan elektron.</p>
+      <p>Analoginya seperti pipa air: pipa yang <b>sempit dan panjang</b> lebih sulit dilewati air dibanding pipa <b>lebar dan pendek</b>. Begitu pula pada kawat penghantar.</p>
+      <p>Berdasarkan kemampuan menghantarkan listrik, bahan dibedakan menjadi:</p>
+      <ul>
+        <li><b>Konduktor</b> — penghantar baik (tembaga, perak, aluminium, emas).</li>
+        <li><b>Isolator</b> — penghambat baik (karet, plastik, kayu, kaca).</li>
+        <li><b>Semikonduktor</b> — di antara konduktor & isolator (silikon, germanium).</li>
+        <li><b>Superkonduktor</b> — hambatan nol pada suhu sangat rendah.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">R = ρ · L / A</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">R</span><span class="desc">Hambatan listrik</span><span class="unit">Ohm (Ω)</span></div>
+        <div class="symbol-row"><span class="sym">ρ</span><span class="desc">Hambatan jenis bahan</span><span class="unit">Ω·m</span></div>
+        <div class="symbol-row"><span class="sym">L</span><span class="desc">Panjang penghantar</span><span class="unit">meter (m)</span></div>
+        <div class="symbol-row"><span class="sym">A</span><span class="desc">Luas penampang</span><span class="unit">m²</span></div>
+      </div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Nilai ρ bahan umum (Ω·m):</p>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">Ag</span><span class="desc">Perak (terbaik)</span><span class="unit">1,59×10⁻⁸</span></div>
+        <div class="symbol-row"><span class="sym">Cu</span><span class="desc">Tembaga</span><span class="unit">1,68×10⁻⁸</span></div>
+        <div class="symbol-row"><span class="sym">Al</span><span class="desc">Aluminium</span><span class="unit">2,65×10⁻⁸</span></div>
+        <div class="symbol-row"><span class="sym">Ni</span><span class="desc">Nikelin</span><span class="unit">~1,1×10⁻⁶</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-list-check"></i>Faktor yang Mempengaruhi</h3>
+      <ul>
+        <li><b>Panjang kawat (L)</b> — makin panjang, hambatan makin besar (berbanding lurus).</li>
+        <li><b>Luas penampang (A)</b> — makin besar, hambatan makin kecil (berbanding terbalik).</li>
+        <li><b>Jenis bahan (ρ)</b> — tembaga jauh lebih baik daripada besi.</li>
+        <li><b>Suhu</b> — makin panas, hambatan makin besar (untuk logam).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Kawat tembaga panjang 2 m dengan luas penampang 1×10⁻⁶ m² dan ρ = 1,7×10⁻⁸ Ω·m. Berapa hambatannya?<br>
+        <b>Jawab:</b> R = (1,7×10⁻⁸ × 2) / 1×10⁻⁶ = <b>3,4×10⁻² Ω = 0,034 Ω</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Jika panjang kawat dijadikan 2 kali dan luas penampang tetap, bagaimana hambatannya?<br>
+        <b>Jawab:</b> R berbanding lurus dengan L → hambatan menjadi <b>2 kali lebih besar</b>.
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Jika luas penampang kawat digandakan (panjang tetap), bagaimana hambatannya?<br>
+        <b>Jawab:</b> R berbanding terbalik dengan A → hambatan menjadi <b>½ kali</b>.
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4:</b> Kawat 4 m dengan A = 2×10⁻⁶ m² memiliki hambatan 3,4 Ω. Berapa ρ bahannya?<br>
+        <b>Jawab:</b> ρ = R·A / L = (3,4 × 2×10⁻⁶) / 4 = <b>1,7×10⁻⁶ Ω·m</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Kabel listrik rumah</b> memakai tembaga karena hambatannya kecil.</li>
+        <li><b>Setrika & pemanas</b> memakai kawat nikelin (ρ besar) agar menghasilkan panas.</li>
+        <li><b>Resistor</b> pada rangkaian elektronik dipakai untuk mengatur besar arus.</li>
+        <li><b>Rheostat</b> — resistor variabel untuk mengatur volume, kecepatan kipas, dll.</li>
+        <li><b>LDR</b> — resistor yang berubah sesuai cahaya (dipakai lampu otomatis).</li>
+        <li><b>NTC/PTC</b> — resistor yang berubah sesuai suhu.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Hambatan memperlambat arus listrik" → hambatan <b>membatasi</b> arus, bukan memperlambat.</li>
+        <li>❌ "Semakin panjang kabel makin baik" → panjang kabel menambah hambatan & rugi daya.</li>
+        <li>❌ "Semua logam konduktor yang sama baik" → perak & tembaga jauh lebih baik dari besi.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Perak adalah konduktor terbaik, tapi tembaga lebih dipakai karena <b>lebih murah</b>.</li>
+        <li>Kabel listrik rumah dibuat dari banyak serat tembaga tipis agar <b>fleksibel</b> namun tetap berdaya hantar tinggi.</li>
+        <li>Pada suhu sangat rendah (mendekati −273 °C), beberapa bahan menjadi <b>superkonduktor</b> dengan R = 0.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Ingat hubungan: R <b>∝ L</b> (lurus dengan panjang) dan R <b>∝ 1/A</b> (terbalik dengan luas). Jadi kalau L ×2 → R ×2. Kalau A ×2 → R ×½. Kalau L ×2 DAN A ×2 → R tetap.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Kawat panjang 5 m, A = 1×10⁻⁶ m², ρ = 1,7×10⁻⁸ Ω·m. Berapa R?</li>
+        <li>Jika panjang kawat dijadikan 3 kali dan luas penampang juga 3 kali, bagaimana R?</li>
+        <li>Sebuah kawat memiliki R = 12 Ω. Jika luas penampang dijadikan 4 kali, berapa R sekarang?</li>
+      </ul>
+    `
+  },
+
+  'hukum-ohm': {
+    title: 'Hukum Ohm',
+    sub: 'V = I · R',
+    icon: 'fa-scale-balanced',
+    tone: 'amber',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Hukum Ohm</b> ditemukan oleh fisikawan Jerman <b>Georg Simon Ohm</b> (1827). Bunyinya: <i>"Kuat arus yang mengalir melalui suatu penghantar sebanding dengan beda potensialnya dan berbanding terbalik dengan hambatannya."</i></p>
+      <p>Artinya: kalau tegangan dinaikkan → arus ikut naik. Kalau hambatan diperbesar → arus mengecil.</p>
+      <p>Grafik hubungan V terhadap I pada hambatan tetap berbentuk <b>garis lurus</b> melalui titik asal — inilah ciri khas Hukum Ohm.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">V = I · R</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain:</p>
+      <div class="rumus-box">I = V / R &nbsp;&nbsp;|&nbsp;&nbsp; R = V / I</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">V</span><span class="desc">Beda potensial</span><span class="unit">Volt (V)</span></div>
+        <div class="symbol-row"><span class="sym">I</span><span class="desc">Kuat arus</span><span class="unit">Ampere (A)</span></div>
+        <div class="symbol-row"><span class="sym">R</span><span class="desc">Hambatan</span><span class="unit">Ohm (Ω)</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Tegangan 12 V dipasang pada hambatan 4 Ω. Berapa kuat arusnya?<br>
+        <b>Jawab:</b> I = V / R = 12 / 4 = <b>3 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Arus 0,5 A mengalir melalui hambatan 20 Ω. Berapa tegangannya?<br>
+        <b>Jawab:</b> V = I · R = 0,5 × 20 = <b>10 V</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Tegangan 9 V menghasilkan arus 0,3 A. Berapa hambatannya?<br>
+        <b>Jawab:</b> R = V / I = 9 / 0,3 = <b>30 Ω</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Perbandingan):</b> Jika R tetap dan V diperbesar 3 kali, bagaimana I?<br>
+        <b>Jawab:</b> Karena I ∝ V → arus menjadi <b>3 kali lebih besar</b>.
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Lampu LED</b> diberi resistor agar arusnya tidak berlebihan.</li>
+        <li><b>Pengatur volume</b> pada radio memakai potensiometer (variasi hukum Ohm).</li>
+        <li><b>Instalasi listrik</b> dirancang agar arus sesuai dengan kapasitas kabel.</li>
+        <li><b>Alat ukur listrik</b> (multimeter) bekerja berdasarkan prinsip Hukum Ohm.</li>
+        <li><b>Rangkaian sensor</b> di Arduino/Raspberry Pi memanfaatkan pembagi tegangan (Hukum Ohm).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Hukum Ohm berlaku untuk semua bahan" → hanya berlaku untuk bahan <b>ohmic</b> (logam pada suhu tetap).</li>
+        <li>❌ "Kalau R besar maka V besar" → R besar justru membuat I kecil, sedangkan V tergantung sumbernya.</li>
+        <li>❌ "R = V × I" → itu SALAH, rumus yang benar adalah <b>V = I × R</b>, jadi R = V / I.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Georg Simon Ohm awalnya ditolak oleh komunitas ilmiah karena teorinya dianggap terlalu sederhana — baru diakui setelah 14 tahun!</li>
+        <li>Satuan hambatan <b>Ohm (Ω)</b> dinamai dari namanya sebagai penghormatan.</li>
+        <li>Hukum Ohm adalah dasar dari semua perhitungan rangkaian listrik, dari HP sampai pembangkit listrik.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Gunakan <b>segitiga ajaib</b> VIR: tutup yang dicari.<br>• V dan R diketahui → I = V/R<br>• V dan I diketahui → R = V/I<br>• I dan R diketahui → V = I·R</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>V = 24 V, R = 8 Ω. Berapa I?</li>
+        <li>I = 0,25 A, R = 40 Ω. Berapa V?</li>
+        <li>V = 5 V, I = 0,1 A. Berapa R?</li>
+      </ul>
+    `
+  },
+
+  'seri': {
+    title: 'Rangkaian Seri',
+    sub: 'Rs = R₁ + R₂ + …',
+    icon: 'fa-arrow-right-arrow-left',
+    tone: 'pink',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Rangkaian seri</b> adalah rangkaian listrik yang komponennya disusun berurutan dalam satu jalur tanpa percabangan. Arus mengalir mengikuti satu jalan, melewati setiap komponen secara bergantian.</p>
+      <p>Karena hanya ada satu jalur, <b>arus yang lewat di setiap titik pasti sama besar</b>. Tegangan total terbagi ke setiap komponen sesuai besar hambatannya.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Sifat</h3>
+      <div class="rumus-box">Rs = R₁ + R₂ + R₃ + …</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Sifat-sifat:</p>
+      <div class="rumus-box">I₁ = I₂ = I₃ &nbsp;|&nbsp; V = V₁ + V₂ + V₃</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Pembagi tegangan:</p>
+      <div class="rumus-box">V₁ = (R₁ / Rs) · V<sub>total</sub></div>
+
+      <h3><i class="fa-solid fa-list-check"></i>Ciri-Ciri</h3>
+      <ul>
+        <li>Komponen disusun berurutan (satu jalur).</li>
+        <li>Arus di setiap titik <b>sama besar</b>.</li>
+        <li>Tegangan total = jumlah tegangan tiap komponen.</li>
+        <li>Hambatan total = jumlah semua hambatan.</li>
+        <li>Jika satu komponen putus, <b>semua komponen mati</b>.</li>
+        <li>Nyala lampu jadi lebih redup jika ditambah komponen (karena arus berkurang).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> R₁ = 4 Ω dan R₂ = 6 Ω disusun seri. Berapa hambatan totalnya?<br>
+        <b>Jawab:</b> Rs = 4 + 6 = <b>10 Ω</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Tiga resistor 2 Ω, 3 Ω, dan 5 Ω disusun seri dengan sumber 20 V. Berapa arusnya?<br>
+        <b>Jawab:</b> Rs = 2+3+5 = 10 Ω → I = V/Rs = 20/10 = <b>2 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> R₁ = 3 Ω, R₂ = 6 Ω diseri dengan sumber 9 V. Berapa tegangan di R₁?<br>
+        <b>Jawab:</b> Rs = 9 Ω → I = 9/9 = 1 A → V₁ = I · R₁ = 1 × 3 = <b>3 V</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Efek mati):</b> Tiga lampu diseri. Jika satu lampu putus, apa yang terjadi?<br>
+        <b>Jawab:</b> Rangkaian jadi <b>terbuka</b> → <b>semua lampu mati</b>.
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Lampu hias pohon natal</b> — sering disusun seri; jika satu mati, semua ikut mati.</li>
+        <li><b>Saklar darurat</b> di mesin industri dirangkai seri agar sistem berhenti total saat ada masalah.</li>
+        <li><b>Sentolop dengan 2 baterai</b> — baterainya disusun seri agar tegangannya bertambah.</li>
+        <li><b>Pembagi tegangan</b> pada rangkaian elektronik untuk mendapatkan tegangan tertentu.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Nyala lampu seri lebih terang" → justru lebih <b>redup</b> karena arus berkurang.</li>
+        <li>❌ "Hambatan seri lebih kecil dari komponennya" → hambatan seri selalu <b>lebih besar</b> dari setiap komponen.</li>
+        <li>❌ "Tegangan sama di semua titik seri" → tegangan <b>berbeda</b>, yang sama adalah <b>arus</b>.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Kabel ekstensi (roll kabel) sering dipasang seri dengan lampu indikator agar mudah tahu apakah arus mengalir.</li>
+        <li>Baterai AAA + AA + 9V yang disusun seri akan menghasilkan tegangan total dari penjumlahan tegangannya.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Bayangkan deretan gerbong kereta — semua gerbong lewat satu jalur. Kalau satu gerbong lepas, seluruh rangkaian terganggu. Itulah esensi <b>seri</b>.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Tiga resistor 5 Ω, 10 Ω, dan 15 Ω diseri. Berapa Rs?</li>
+        <li>Rs total = 24 Ω dari dua hambatan, salah satunya 8 Ω. Berapa yang lain?</li>
+        <li>R₁ = 6 Ω, R₂ = 4 Ω diseri pada sumber 12 V. Berapa arus & tegangan R₁?</li>
+      </ul>
+    `
+  },
+
+  'paralel': {
+    title: 'Rangkaian Paralel',
+    sub: '1/Rp = 1/R₁ + 1/R₂',
+    icon: 'fa-code-branch',
+    tone: 'indigo',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Rangkaian paralel</b> adalah rangkaian listrik yang komponennya disusun bercabang, sehingga arus dapat mengalir melalui beberapa jalur sekaligus. Setiap cabang "berdiri sendiri".</p>
+      <p>Karena semua cabang terhubung ke titik yang sama, <b>tegangan di setiap cabang sama besar</b>. Arus total terbagi ke setiap cabang sesuai hambatannya.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Sifat</h3>
+      <div class="rumus-box">1/Rp = 1/R₁ + 1/R₂ + …</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Khusus 2 hambatan:</p>
+      <div class="rumus-box">Rp = (R₁ · R₂) / (R₁ + R₂)</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Khusus n hambatan sama:</p>
+      <div class="rumus-box">Rp = R / n</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Sifat-sifat:</p>
+      <div class="rumus-box">V₁ = V₂ = V₃ &nbsp;|&nbsp; I = I₁ + I₂ + I₃</div>
+
+      <h3><i class="fa-solid fa-list-check"></i>Ciri-Ciri</h3>
+      <ul>
+        <li>Komponen bercabang (beberapa jalur).</li>
+        <li>Tegangan setiap cabang <b>sama</b>.</li>
+        <li>Arus total = jumlah arus tiap cabang.</li>
+        <li>Hambatan total <b>selalu lebih kecil</b> dari hambatan terkecil.</li>
+        <li>Jika satu komponen putus, yang lain <b>tetap hidup</b>.</li>
+        <li>Nyala lampu tidak berubah walau ditambah cabang (tegangan tetap).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> R₁ = 6 Ω dan R₂ = 3 Ω disusun paralel. Berapa Rp?<br>
+        <b>Jawab:</b> 1/Rp = 1/6 + 1/3 = 1/6 + 2/6 = 3/6 → Rp = <b>2 Ω</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Dua lampu 60 Ω dan 30 Ω dihubungkan paralel ke sumber 12 V. Berapa arus total?<br>
+        <b>Jawab:</b> Rp = (60×30)/(60+30) = 20 Ω → I = V/Rp = 12/20 = <b>0,6 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Tiga resistor 6 Ω disusun paralel. Berapa Rp?<br>
+        <b>Jawab:</b> Rp = R/n = 6/3 = <b>2 Ω</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Arus cabang):</b> V = 12 V, R₁ = 4 Ω, R₂ = 6 Ω paralel. Berapa I₁ & I₂?<br>
+        <b>Jawab:</b> I₁ = 12/4 = 3 A; I₂ = 12/6 = 2 A; I total = <b>5 A</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Instalasi rumah</b> — semua lampu & stop kontak dipasang paralel, jadi bisa dinyalakan/dimatikan terpisah.</li>
+        <li><b>Lampu LED strip</b> — sering paralel agar tetap menyala walau ada yang rusak.</li>
+        <li><b>Power bank</b> — beberapa baterai kecil diparalel untuk menambah kapasitas arus.</li>
+        <li><b>Panel surya</b> — diparalel untuk menambah arus tanpa mengubah tegangan.</li>
+        <li><b>Sistem kelistrikan mobil</b> — semua komponen (lampu, radio, klakson) paralel terhadap aki 12 V.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Hambatan paralel lebih besar dari terkecil" → justru <b>selalu lebih kecil</b>.</li>
+        <li>❌ "Arus sama di setiap cabang paralel" → yang sama adalah <b>tegangan</b>, arus justru terbagi.</li>
+        <li>❌ "Rp = R₁ + R₂" → itu rumus untuk <b>seri</b>, bukan paralel.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Hampir semua instalasi listrik rumah menggunakan prinsip paralel — karena itu satu lampu mati tidak mematikan lampu lain.</li>
+        <li>Jika kamu paralelkan dua resistor yang identik, nilai totalnya menjadi setengah dari masing-masing.</li>
+        <li>Rp selalu <b>lebih kecil</b> dari hambatan terkecil — bahkan jika kamu paralelkan hambatan 1 Ω dengan 1.000.000 Ω, Rp-nya mendekati 1 Ω.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Hambatan paralel seperti jalan tol bercabang — makin banyak cabang, makin lancar aliran, makin <b>kecil</b> hambatan totalnya.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>R₁ = 12 Ω dan R₂ = 4 Ω paralel. Berapa Rp?</li>
+        <li>Empat resistor 20 Ω paralel. Berapa Rp?</li>
+        <li>V = 24 V, R₁ = 8 Ω, R₂ = 12 Ω paralel. Berapa arus total?</li>
+      </ul>
+    `
+  },
+
+  'daya': {
+    title: 'Daya Listrik',
+    sub: 'P = V · I',
+    icon: 'fa-bolt',
+    tone: '',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Daya listrik</b> adalah laju energi listrik yang digunakan atau diubah menjadi bentuk energi lain setiap satuan waktu. Sederhananya, daya menunjukkan seberapa "boros" atau "cepat" sebuah alat mengonsumsi listrik.</p>
+      <p>Semakin besar daya alat, semakin cepat pula ia menghabiskan energi (dan makin besar tagihan listriknya!).</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">P = V · I</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain (dari Hukum Ohm):</p>
+      <div class="rumus-box">P = I² · R &nbsp;&nbsp;|&nbsp;&nbsp; P = V² / R</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">P</span><span class="desc">Daya listrik</span><span class="unit">Watt (W)</span></div>
+        <div class="symbol-row"><span class="sym">V</span><span class="desc">Beda potensial</span><span class="unit">Volt (V)</span></div>
+        <div class="symbol-row"><span class="sym">I</span><span class="desc">Kuat arus</span><span class="unit">Ampere (A)</span></div>
+        <div class="symbol-row"><span class="sym">R</span><span class="desc">Hambatan</span><span class="unit">Ohm (Ω)</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Lampu dialiri arus 0,5 A pada tegangan 220 V. Berapa dayanya?<br>
+        <b>Jawab:</b> P = V · I = 220 × 0,5 = <b>110 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Alat 220 V memiliki hambatan 44 Ω. Berapa dayanya?<br>
+        <b>Jawab:</b> P = V² / R = 220² / 44 = 48.400 / 44 = <b>1.100 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Setrika 220 V mengalirkan arus 2 A. Berapa dayanya?<br>
+        <b>Jawab:</b> P = 220 × 2 = <b>440 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4:</b> Sebuah resistor 100 Ω dialiri arus 0,2 A. Berapa dayanya?<br>
+        <b>Jawab:</b> P = I² · R = (0,2)² × 100 = 0,04 × 100 = <b>4 W</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Lampu LED 5 W</b> vs <b>lampu pijar 40 W</b> — LED lebih hemat meski terangnya sama.</li>
+        <li><b>Setrika 300 W</b>, <b>AC 800 W</b>, <b>hair dryer 1200 W</b> — semua tercantum di label alat.</li>
+        <li><b>MCB rumah</b> biasanya 900 VA–2200 VA mengikuti total daya terpasang.</li>
+        <li><b>Kipas angin 45 W</b>, <b>TV LED 50 W</b>, <b>kulkas 100 W</b>, <b>mesin cuci 300 W</b>.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Daya = energi" → daya = <b>laju</b> energi per waktu, sedangkan energi = total.</li>
+        <li>❌ "Watt dan VA sama" → Watt = daya nyata, VA = daya semu (dipengaruhi faktor daya).</li>
+        <li>❌ "Makin besar Watt makin bagus" → tergantung kebutuhan; untuk lampu, Watt kecil justru lebih hemat.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Nama satuan <b>Watt</b> berasal dari penemu mesin uap, <b>James Watt</b>.</li>
+        <li>1 Watt = 1 Joule per detik = 1 VA (untuk beban resistif murni).</li>
+        <li>Kalkulator bertenaga surya bisa menyala dengan daya kurang dari <b>1 mW</b>!</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Satuan daya yang lebih besar: <b>1 kW = 1000 W</b>. Tagihan listrik dihitung dari <b>pemakaian daya (kW) × waktu (jam) = kWh</b>. Pilih rumus daya sesuai data yang diketahui: V & I → V·I, I & R → I²·R, V & R → V²/R.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Lampu 12 V mengalirkan arus 0,25 A. Berapa dayanya?</li>
+        <li>Resistor 50 Ω dialiri arus 0,4 A. Berapa dayanya?</li>
+        <li>Alat pada 110 V dengan R = 22 Ω. Berapa dayanya?</li>
+      </ul>
+    `
+  },
+
+  'energi': {
+    title: 'Energi Listrik',
+    sub: 'W = P · t',
+    icon: 'fa-fire',
+    tone: 'amber',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Energi listrik</b> adalah total energi yang digunakan oleh suatu alat listrik selama selang waktu tertentu. Kalau <b>daya</b> itu "kecepatan" pakai listrik, maka <b>energi</b> adalah "total" yang sudah dipakai.</p>
+      <p>Energi listrik diukur dalam <b>Joule (J)</b> atau <b>kilowatt-jam (kWh)</b> — yang terakhir inilah yang muncul di tagihan PLN.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">W = P · t</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain:</p>
+      <div class="rumus-box">W = V · I · t &nbsp;&nbsp;|&nbsp;&nbsp; W = I² · R · t</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">W</span><span class="desc">Energi listrik</span><span class="unit">Joule (J)</span></div>
+        <div class="symbol-row"><span class="sym">P</span><span class="desc">Daya listrik</span><span class="unit">Watt (W)</span></div>
+        <div class="symbol-row"><span class="sym">t</span><span class="desc">Waktu</span><span class="unit">sekon (s)</span></div>
+      </div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Lampu 100 W menyala 5 jam. Berapa energi listriknya?<br>
+        <b>Jawab:</b> t = 5 × 3600 = 18.000 s → W = 100 × 18.000 = <b>1,8 × 10⁶ J</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Setrika 300 W dipakai 2 jam sehari selama 30 hari. Berapa kWh?<br>
+        <b>Jawab:</b> P = 0,3 kW, t total = 2×30 = 60 jam → W = 0,3 × 60 = <b>18 kWh</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Lampu 60 W menyala 4 jam. Berapa kWh?<br>
+        <b>Jawab:</b> P = 0,06 kW, t = 4 jam → W = 0,06 × 4 = <b>0,24 kWh</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Biaya listrik):</b> Lampu 20 W menyala 10 jam/hari selama 30 hari, tarif Rp1.500/kWh. Berapa biayanya?<br>
+        <b>Jawab:</b> W = 0,02 × 10 × 30 = 6 kWh → biaya = 6 × Rp1.500 = <b>Rp9.000</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Tagihan PLN</b> = jumlah kWh × tarif per kWh (misal Rp1.500).</li>
+        <li><b>Baterai HP</b> menyimpan energi dalam satuan mAh (yang bisa dikonversi ke Wh).</li>
+        <li><b>PLN token</b> — semakin sering alat berdaya besar dipakai, token makin cepat habis.</li>
+        <li><b>Power bank 20.000 mAh</b> = menyimpan energi sekitar 74 Wh.</li>
+        <li><b>Kendaraan listrik</b> menyimpan energi 40–100 kWh di baterainya.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Watt = kWh" → Watt adalah daya (kW), kWh adalah energi (daya × waktu).</li>
+        <li>❌ "Alat berdaya besar pasti mahal" → biaya = daya × waktu; alat berdaya besar yang jarang dipakai bisa lebih murah.</li>
+        <li>❌ "kWh = kilowatt per jam" → kWh = kilowatt <b>kali</b> jam, bukan per jam.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Tarif listrik di Indonesia berkisar Rp1.400–Rp1.700 per kWh (subsidi berbeda-beda).</li>
+        <li>Satu kWh setara dengan menyalakan lampu 10 W selama 100 jam!</li>
+        <li>Bumi menerima energi matahari ~174.000 TW setiap saat, jauh lebih dari kebutuhan seluruh umat manusia.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Konversi penting: <b>1 kWh = 3,6 × 10⁶ J</b>. Untuk hitung kWh, ubah dulu daya ke kW dan waktu ke jam. Untuk hitung Joule, ubah daya ke W dan waktu ke sekon.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>AC 800 W menyala 6 jam sehari. Berapa kWh dalam 30 hari?</li>
+        <li>TV 50 W menyala 8 jam sehari. Berapa biaya listrik dalam 30 hari (tarif Rp1.500/kWh)?</li>
+        <li>Kulkas 100 W menyala 24 jam. Berapa kWh per hari?</li>
+      </ul>
+    `
+  },
+
+  'kirchhoff': {
+    title: 'Hukum Kirchhoff',
+    sub: 'ΣI masuk = ΣI keluar',
+    icon: 'fa-plug-circle-bolt',
+    tone: 'orange',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Hukum Kirchhoff</b> dikemukakan oleh fisikawan Jerman <b>Gustav Kirchhoff</b>. Ada dua hukum:</p>
+      <ul>
+        <li><b>Hukum I (Arus)</b> — jumlah arus yang masuk ke suatu titik cabang = jumlah arus yang keluar.</li>
+        <li><b>Hukum II (Tegangan)</b> — jumlah aljabar tegangan dalam satu loop tertutup = nol (ΣE = ΣI·R).</li>
+      </ul>
+      <p>Hukum I adalah bentuk <b>kekekalan muatan listrik</b>: muatan tidak bisa menumpuk di titik cabang.</p>
+      <p>Hukum II adalah bentuk <b>kekekalan energi</b>: energi yang diberikan sumber sama dengan energi yang dipakai hambatan dalam loop.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus</h3>
+      <div class="rumus-box">ΣI masuk = ΣI keluar</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Hukum II Kirchhoff:</p>
+      <div class="rumus-box">ΣE = ΣI · R</div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Arus masuk ke titik cabang 5 A. Jika I₁ = 2 A dan I₂ = 1 A, berapa I₃?<br>
+        <b>Jawab:</b> 5 = 2 + 1 + I₃ → I₃ = <b>2 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Dua arus masuk 3 A dan 2 A, satu arus keluar 4 A. Berapa arus keluar lainnya?<br>
+        <b>Jawab:</b> ΣI masuk = ΣI keluar → 3 + 2 = 4 + Iₓ → Iₓ = <b>1 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3 (Loop):</b> Loop dengan baterai 12 V, R₁ = 2 Ω, R₂ = 4 Ω. Berapa arusnya?<br>
+        <b>Jawab:</b> ΣE = ΣI·R → 12 = I(2+4) = 6I → I = <b>2 A</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Loop lebih kompleks):</b> Loop dengan E₁ = 10 V dan E₂ = 4 V, hambatan total 3 Ω. Berapa arus?<br>
+        <b>Jawab:</b> ΣE = 10 − 4 = 6 V → I = 6/3 = <b>2 A</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Analisis rangkaian listrik rumah</b> — memastikan arus yang masuk ke rumah sama dengan yang digunakan alat-alat.</li>
+        <li><b>Perancangan rangkaian elektronik</b> — PCB, radio, TV, dan HP semuanya mengikuti hukum ini.</li>
+        <li><b>Sistem kelistrikan kendaraan</b> — aki menyalurkan arus ke lampu, klakson, radio yang terhubung paralel.</li>
+        <li><b>Analisis rangkaian kompleks</b> yang tidak bisa diselesaikan hanya dengan Hukum Ohm.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Hukum Kirchhoff hanya untuk rangkaian paralel" → berlaku untuk <b>semua</b> rangkaian.</li>
+        <li>❌ "Arus bisa hilang di percabangan" → total arus masuk = total arus keluar, tidak ada yang hilang.</li>
+        <li>❌ "Kirchhoff menggantikan Hukum Ohm" → keduanya saling melengkapi, bukan menggantikan.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li>Gustav Kirchhoff merumuskan hukum ini pada usia <b>21 tahun</b> (1845).</li>
+        <li>Bersama Robert Bunsen, Kirchhoff juga menemukan <b>spektroskopi</b> dan menemukan unsur cesium & rubidium.</li>
+        <li>Hukum Kirchhoff menjadi dasar analisis rangkaian listrik kompleks di semua software simulasi (SPICE, Multisim, dll).</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Bayangkan titik cabang sebagai <b>persimpangan jalan</b>: berapa mobil masuk, sebanyak itu pula yang keluar. Tidak ada mobil yang "menghilang" di persimpangan. Untuk loop, bayangkan <b>perjalanan keliling</b> — total "naik-turun" harus nol saat kembali ke titik awal.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Arus masuk 8 A ke titik cabang. Jika I₁ = 3 A, I₂ = 2 A, berapa I₃?</li>
+        <li>Loop dengan baterai 9 V, R total 3 Ω. Berapa arusnya?</li>
+        <li>Dua baterai 6 V dan 2 V berlawanan arah dalam loop dengan R = 2 Ω. Berapa arus?</li>
+      </ul>
+    `
+  },
+
+  'daya-hambatan': {
+    title: 'Daya pada Hambatan',
+    sub: 'P = I² · R',
+    icon: 'fa-plug',
+    tone: 'purple',
+    body: `
+      <h3><i class="fa-solid fa-circle-info"></i>Konsep Dasar</h3>
+      <p><b>Daya pada hambatan</b> adalah daya listrik yang terdisipasi (terbuang) menjadi panas ketika arus melewati sebuah hambatan. Inilah prinsip kerja semua alat pemanas listrik.</p>
+      <p>Energi listrik tidak hilang begitu saja — ia <b>berubah menjadi energi panas</b>. Inilah penerapan Hukum Kekekalan Energi dalam bentuk nyata.</p>
+      <p>Fenomena ini disebut juga <b>Efek Joule</b>, diambil dari nama fisikawan James Prescott Joule.</p>
+
+      <h3><i class="fa-solid fa-square-root-variable"></i>Rumus & Keterangan</h3>
+      <div class="rumus-box">P = I² · R</div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Bentuk lain:</p>
+      <div class="rumus-box">P = V² / R &nbsp;&nbsp;|&nbsp;&nbsp; P = V · I</div>
+      <div class="symbol-table">
+        <div class="symbol-row"><span class="sym">P</span><span class="desc">Daya</span><span class="unit">Watt (W)</span></div>
+        <div class="symbol-row"><span class="sym">I</span><span class="desc">Kuat arus</span><span class="unit">Ampere (A)</span></div>
+        <div class="symbol-row"><span class="sym">R</span><span class="desc">Hambatan</span><span class="unit">Ohm (Ω)</span></div>
+        <div class="symbol-row"><span class="sym">V</span><span class="desc">Tegangan</span><span class="unit">Volt (V)</span></div>
+      </div>
+      <p style="text-align:center;font-weight:700;color:var(--muted);font-size:12px;">Kalor yang dihasilkan:</p>
+      <div class="rumus-box">Q = I² · R · t</div>
+
+      <h3><i class="fa-solid fa-lightbulb"></i>Contoh Soal</h3>
+      <div class="contoh-box">
+        <b>Contoh 1:</b> Arus 2 A melewati hambatan 5 Ω. Berapa dayanya?<br>
+        <b>Jawab:</b> P = I² · R = 4 × 5 = <b>20 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 2:</b> Kawat dengan hambatan 4 Ω dipasang pada tegangan 12 V. Berapa panas yang dihasilkan?<br>
+        <b>Jawab:</b> P = V² / R = 144 / 4 = <b>36 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 3:</b> Setrika 220 V dengan R = 44 Ω. Berapa dayanya?<br>
+        <b>Jawab:</b> P = 220²/44 = <b>1.100 W</b>
+      </div>
+      <div class="contoh-box">
+        <b>Contoh 4 (Kalor):</b> Pemanas 500 W dipakai 5 menit. Berapa energi panas yang dihasilkan?<br>
+        <b>Jawab:</b> t = 300 s → W = 500 × 300 = <b>150.000 J = 150 kJ</b>
+      </div>
+
+      <h3><i class="fa-solid fa-bolt"></i>Penerapan Sehari-hari</h3>
+      <ul>
+        <li><b>Setrika listrik</b> — kawat nikelin memanas karena hambatannya besar.</li>
+        <li><b>Pemanas air (water heater)</b> — elemen pemanas mengubah listrik menjadi panas untuk memanaskan air.</li>
+        <li><b>Solder listrik</b> — melelehkan timah pada suhu ratusan derajat karena daya pada hambatan.</li>
+        <li><b>Risiko kebakaran</b> — kabel yang kekecilan dialiri arus besar akan cepat panas dan bisa terbakar.</li>
+        <li><b>Sekring / MCB</b> — dirancang meleleh/memutus saat arus melebihi batas agar kabel tidak terbakar.</li>
+        <li><b>Kompor listrik & rice cooker</b> — memanfaatkan efek Joule untuk memasak.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-triangle-exclamation"></i>Miskonsepsi Umum</h3>
+      <ul>
+        <li>❌ "Semua hambatan pasti menghasilkan panas" → iya, tapi yang berdaya besar baru terasa panas nyata.</li>
+        <li>❌ "P ∝ I" → P <b>∝ I²</b>, jadi jika arus ×2 maka panas ×4!</li>
+        <li>❌ "Semua kabel sama" → kabel kecil tidak boleh dialiri arus besar karena bisa terbakar.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-star"></i>Fakta Menarik</h3>
+      <ul>
+        <li><b>Efek Joule</b> ditemukan oleh James Prescott Joule pada tahun 1840 — awalnya dianggap remeh, kini jadi dasar semua alat pemanas listrik.</li>
+        <li>Lampu pijar 90% energinya berubah jadi panas, hanya 10% jadi cahaya — itulah mengapa lampu pijar boros!</li>
+        <li>Kabel listrik rumah biasanya diberi batas arus maksimum (misal 10 A) sesuai luas penampangnya. Kalau dilanggar → kabel memanas → risiko kebakaran.</li>
+      </ul>
+
+      <h3><i class="fa-solid fa-check-circle"></i>Tips Belajar</h3>
+      <div class="tip-box"><i class="fa-solid fa-check-circle"></i><div>Daya pada hambatan naik <b>kuadrat</b> terhadap arus. Artinya, jika arus digandakan, panas yang dihasilkan menjadi <b>4 kali lipat</b>. Inilah alasan kabel harus disesuaikan dengan arus yang mengalir. Pilih rumus P = I²·R jika I & R diketahui; P = V²/R jika V & R diketahui.</div></div>
+
+      <h3><i class="fa-solid fa-pen-to-square"></i>Latihan Mandiri</h3>
+      <ul>
+        <li>Arus 3 A melewati hambatan 8 Ω. Berapa dayanya?</li>
+        <li>Resistor 100 Ω pada tegangan 20 V. Berapa dayanya?</li>
+        <li>Pemanas 300 W digunakan 10 menit. Berapa energi panasnya (dalam Joule)?</li>
+      </ul>
+    `
+  }
+};
+
+/* ============================================================
+   MATERI RUMUS — OPEN/CLOSE
+   ============================================================ */
+const rumusOverlay     = document.getElementById('rumusOverlay');
+const rumusDetailIco   = document.getElementById('rumusDetailIco');
+const rumusDetailTitle = document.getElementById('rumusDetailTitle');
+const rumusDetailSub   = document.getElementById('rumusDetailSub');
+const rumusDetailBody  = document.getElementById('rumusDetailBody');
+const rumusClose       = document.getElementById('rumusClose');
+
+function openRumus(key){
+  const data = RUMUS_DATA[key];
+  if (!data || !rumusOverlay) return;
+
+  rumusDetailIco.className = 'rumus-detail-ico';
+  const iconI = document.createElement('i');
+  iconI.className = 'fa-solid ' + data.icon;
+  rumusDetailIco.innerHTML = '';
+  rumusDetailIco.appendChild(iconI);
+
+  const headEl = rumusDetailIco.parentElement;
+  headEl.style.background = '';
+  headEl.classList.remove('tone-purple','tone-teal','tone-amber','tone-pink','tone-indigo','tone-orange');
+
+  rumusDetailTitle.textContent = data.title;
+  rumusDetailSub.textContent   = data.sub;
+
+  const toneColors = {
+    '':       'var(--blue)',
+    'purple': 'var(--purple)',
+    'teal':   'var(--teal)',
+    'amber':  'var(--amber)',
+    'pink':   'var(--pink)',
+    'indigo': 'var(--indigo)',
+    'orange': 'var(--orange)'
+  };
+  headEl.style.background = toneColors[data.tone] || toneColors[''];
+
+  rumusDetailBody.innerHTML = data.body;
+  rumusOverlay.classList.add('show');
+}
+
+function closeRumus(){
+  if (rumusOverlay) rumusOverlay.classList.remove('show');
+}
+
+document.querySelectorAll('#rumusGrid .coll').forEach(card => {
+  card.addEventListener('click', () => openRumus(card.dataset.rumus));
+});
+
+rumusClose?.addEventListener('click', closeRumus);
+rumusOverlay?.addEventListener('click', (e) => {
+  if (e.target === rumusOverlay) closeRumus();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeRumus();
+});
+
+/* ============================================================
+   TESLA BIO — klik 3D viewer untuk buka popup
+   ============================================================ */
+const teslaOverlay = document.getElementById('teslaOverlay');
+const teslaClose   = document.getElementById('teslaClose');
+
+function openTeslaBio(){ teslaOverlay?.classList.add('show'); }
+function closeTeslaBio(){ teslaOverlay?.classList.remove('show'); }
+
+teslaClose?.addEventListener('click', closeTeslaBio);
+teslaOverlay?.addEventListener('click', e => {
+  if (e.target === teslaOverlay) closeTeslaBio();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeTeslaBio();
+});
+
+/* Deteksi tap vs drag pada stage 3D */
+const stage3dEl = document.getElementById('stage3d');
+if (stage3dEl) {
+  let pdX = 0, pdY = 0, pdT = 0, moved = false;
+
+  stage3dEl.addEventListener('pointerdown', e => {
+    pdX = e.clientX; pdY = e.clientY;
+    pdT = Date.now();
+    moved = false;
+  });
+
+  stage3dEl.addEventListener('pointermove', e => {
+    if (Math.hypot(e.clientX - pdX, e.clientY - pdY) > 10) moved = true;
+  });
+
+  stage3dEl.addEventListener('pointerup', e => {
+    const dist = Math.hypot(e.clientX - pdX, e.clientY - pdY);
+    const dt   = Date.now() - pdT;
+    // hanya buka popup kalau benar-benar tap (bukan geser untuk memutar)
+    if (!moved && dist < 10 && dt < 600) openTeslaBio();
+  });
+}
+
+/* ============================================================
+   AI CHAT — NARA AI
+   ============================================================ */
+const GROQ_API_KEY = "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";
+const GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL   = "openai/gpt-oss-20b";
+
+let isProcessing = false;
+
+const chatBody  = document.getElementById('chatBody');
+const chatEmpty = document.getElementById('chatEmpty');
+const chatText  = document.getElementById('chatText');
+const chatSend  = document.getElementById('chatSend');
+
+function renderLatex(element){
+  if (typeof renderMathInElement === 'function'){
+    try{
+      renderMathInElement(element, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#4b1dd6'
+      });
+    }catch(e){
+      console.warn('LaTeX render error:', e);
+    }
+  } else {
+    setTimeout(() => renderLatex(element), 300);
+  }
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function formatAIText(text){
+  let c = String(text);
+
+  const mathBlocks = [];
+  c = c.replace(/\$\$[\s\S]*?\$\$/g, m => {
+    mathBlocks.push(m);
+    return '@@MATH' + (mathBlocks.length - 1) + '@@';
+  });
+  c = c.replace(/\\\[[\s\S]*?\\\]/g, m => {
+    mathBlocks.push(m);
+    return '@@MATH' + (mathBlocks.length - 1) + '@@';
+  });
+
+  c = c.replace(/\*\*(.*?):\*\*/g, '<span class="section-title">$1:</span>');
+  c = c.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  c = c.replace(/(^|\s)\*([^*\n]+)\*(\s|$)/g, '$1<em>$2</em>$3');
+
+  const lines = c.split('\n');
+  let html = '';
+  let inList = false;
+
+  for (const line of lines){
+    const t = line.trim();
+    if (!t) continue;
+
+    const m = t.match(/^(?:[•\-\*]|\d+\.)\s+(.*)$/);
+    if (m){
+      if (!inList){ html += '<ul>'; inList = true; }
+      html += '<li>' + m[1] + '</li>';
+    } else {
+      if (inList){ html += '</ul>'; inList = false; }
+      html += '<p>' + t + '</p>';
+    }
+  }
+  if (inList) html += '</ul>';
+
+  html = html.replace(/@@MATH(\d+)@@/g, (_, i) => mathBlocks[Number(i)] || '');
+
+  return html;
+}
+
+function addMsg(role, html, skipLatex){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+
+  const av = document.createElement('div');
+  av.className = 'av';
+  av.innerHTML = role === 'user'
+    ? '<i class="fa-solid fa-user"></i>'
+    : '<i class="fa-solid fa-robot"></i>';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = html;
+
+  wrap.appendChild(av);
+  wrap.appendChild(bubble);
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  if (!skipLatex) {
+    renderLatex(bubble);
+    setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 60);
+  }
+
+  return wrap;
+}
+
+function showTyping(){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ai typing';
+  wrap.id = 'typingIndicator';
+  wrap.innerHTML = '<div class="av"><i class="fa-solid fa-robot"></i></div>' +
+                   '<div class="bubble"><i></i><i></i><i></i></div>';
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function removeTyping(){
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function handleCreatorQuestion(question){
+  const lower = question.toLowerCase();
+  const keywords = [
+    'dibuat oleh', 'siapa pembuat', 'kamu dibuat', 'pencipta',
+    'dibuat siapa', 'by siapa', 'diciptakan oleh', 'pembuatmu',
+    'siapakah pembuat', 'dibuat oleh siapa', 'siapa yang membuatmu',
+    'siapa kamu', 'kamu siapa'
+  ];
+  if (keywords.some(kw => lower.includes(kw))){
+    return "Saya **Nara AI**, asisten fisika yang dibuat oleh mahasiswa atas nama **Nayla Arziki Ramadani Yuva** dari **Universitas Ahmad Dahlan**. 🎓";
+  }
+  return null;
+}
+
+async function callGroq(prompt){
+  const response = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.7,
+      max_tokens: 1024,
+      top_p: 0.9,
+      messages: [
+        {
+          role: "system",
+          content: `Anda adalah Nara AI, asisten fisika yang cerdas, ramah, dan bersemangat. Anda ahli dalam termodinamika, mekanika, listrik, magnet, optik, dan fisika modern. Gunakan bahasa Indonesia yang baik, jelas, dan mudah dipahami. Suka memberi analogi sederhana dan contoh sehari-hari. Jaga agar jawaban tetap akurat dan informatif.
+
+**PENTING:** Untuk menulis rumus matematika atau fisika, gunakan format LaTeX:
+- Inline: \\( E = mc^2 \\)
+- Display (baris sendiri): $$ F = ma $$
+- Atau gunakan \\[ ... \\] untuk display math.
+
+Gunakan LaTeX untuk semua persamaan dan rumus agar mudah dibaca.
+Format jawaban:
+- Gunakan **teks tebal** untuk kata kunci
+- Gunakan bullet points (•) untuk poin-poin penting
+- Gunakan **Judul:** untuk bagian-bagian penting
+- Pisahkan paragraf dengan jelas
+- Maksimal 300 kata.
+
+**Jika pengguna menanyakan siapa yang membuat Anda, atau pertanyaan serupa tentang asal-usul Anda, jawablah dengan: "Saya Nara AI, dibuat oleh mahasiswa atas nama Nayla Arziki Ramadani Yuva dari Universitas Ahmad Dahlan."**`
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok){
+    const msg = data?.error?.message || data?.message || "Groq API Error";
+    throw new Error(msg);
+  }
+
+  return data.choices?.[0]?.message?.content || "Tidak ada respons dari Nara AI.";
+}
+
+async function askAI(question){
+  if (isProcessing) return;
+  question = (question || '').trim();
+  if (!question) return;
+
+  if (chatEmpty) chatEmpty.style.display = 'none';
+
+  addMsg('user', escapeHtml(question), true);
+  chatText.value = '';
+  chatText.style.height = 'auto';
+
+  const direct = handleCreatorQuestion(question);
+  if (direct){
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMsg('ai', formatAIText(direct));
+    }, 450);
+    return;
+  }
+
+  isProcessing = true;
+  chatSend.disabled = true;
+  showTyping();
+
+  try{
+    const prompt =
+`Anda adalah Nara AI, asisten fisika cerdas. Pengguna bertanya: "${question}"
+
+Berikan jawaban yang informatif, akurat, dan mudah dipahami. Gunakan bahasa Indonesia yang hangat dan bersahabat.
+
+Format jawaban:
+- Gunakan **teks tebal** untuk kata kunci
+- Gunakan bullet points (•) untuk poin-poin penting
+- Gunakan **Judul:** untuk bagian-bagian penting
+- Pisahkan paragraf dengan jelas
+- **WAJIB** gunakan LaTeX untuk semua rumus matematika/fisika.
+- Maksimal 300 kata.`;
+
+    const response = await callGroq(prompt);
+    removeTyping();
+    addMsg('ai', formatAIText(response));
+  }catch(error){
+    removeTyping();
+    addMsg('ai', escapeHtml('⚠️ Maaf, terjadi kesalahan: ' + error.message + '. Coba lagi nanti ya!'), true);
+  }
+
+  isProcessing = false;
+  chatSend.disabled = false;
+  chatText.focus();
+}
+
+chatSend.addEventListener('click', () => askAI(chatText.value));
+
+chatText.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    askAI(chatText.value);
+  }
+});
+
+chatText.addEventListener('input', () => {
+  chatText.style.height = 'auto';
+  chatText.style.height = Math.min(chatText.scrollHeight, 120) + 'px';
+});
+
+document.querySelectorAll('.sugg button').forEach(b => {
+  b.addEventListener('click', () => askAI(b.dataset.q));
+});
+
+document.body.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive:false });
+
+console.log('🧠 Nara AI · Asisten Fisika Cerdas (Groq langsung)');
+console.log('⭐ Total Poin & Konversi Nilai aktif');
+console.log('🎉 Popup Poin dengan confetti aktif!');
+console.log('📚 Menu Materi → bacaan lengkap (8 section) aktif');
+console.log('📝 Menu Soal → 10 latihan interaktif aktif');
+console.log('🏠 Beranda → data-href · 📝 Soal → data-target');
+console.log('🎯 Filter Soal aktif: Semua / Dasar / Hukum / Rangkaian');
+console.log('⚡ Klik/Tap 3D viewer → popup biografi Nikola Tesla');
+console.log('🤖 Model: ' + GROQ_MODEL);
+console.log('👩‍🎓 Dibuat oleh Nayla Arzizki Ramadani Yuva (Universitas Ahmad Dahlan)');
+</script>
+</body>
+</html>

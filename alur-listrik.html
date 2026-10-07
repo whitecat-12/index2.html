@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>AR Praktikum Elektronika — Rangkaian Terbuka &amp; Tertutup</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/",
+    "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+  }
+}
+</script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; overflow: hidden; background: #0b0f14;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+/* MindAR mengatur sendiri posisi video & canvas di dalam container */
+#container { position: fixed; inset: 0; display: none; background: #000; overflow: hidden; }
+#container.mode-3d canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+
+#overlay {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 22px; padding: 32px; text-align: center; color: #e7f6f8;
+  background: radial-gradient(circle at 50% 30%, #10241f 0%, #0b0f14 70%);
+}
+#overlay h1 {
+  font-size: 40px; font-weight: 700; line-height: 1.2;
+  background: linear-gradient(135deg, #34d399, #22d3ee, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+#overlay p.sub { font-size: 14px; color: #7f9aa3; max-width: 360px; line-height: 1.6; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+#startBtn, #demoBtn {
+  padding: 14px 32px; font-size: 16px; font-weight: 600; border: none;
+  border-radius: 999px; cursor: pointer; transition: transform .15s, box-shadow .2s;
+}
+#startBtn { background: linear-gradient(135deg, #34d399, #0891b2); color: #04211c; }
+#startBtn:hover { box-shadow: 0 0 32px 4px rgba(52,211,153,.35); }
+#demoBtn { background: rgba(255,255,255,.08); color: #d6faff; border: 1px solid rgba(255,255,255,.2); }
+#demoBtn:hover { background: rgba(255,255,255,.15); }
+.btn-row button:active { transform: scale(.96); }
+.btn-row button:disabled { opacity: .5; }
+#statusMsg {
+  font-size: 12.5px; color: #8fa5ab; min-height: 34px; line-height: 1.5;
+  position: absolute; bottom: 24px; left: 0; right: 0; padding: 0 24px; pointer-events: none;
+}
+#statusMsg.error { color: #ff9a8a; }
+
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: none;
+  align-items: center; justify-content: space-between; padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(0,0,0,.65), transparent); pointer-events: none;
+}
+#hud .left { display: flex; align-items: center; gap: 10px; }
+#hud span { color: #fff; font-size: 13px; opacity: .9; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+#modeBadge {
+  font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+  background: rgba(52,211,153,.2); border: 1px solid rgba(52,211,153,.5); color: #a7f3d0;
+}
+#modeBadge.mode-3d { background: rgba(167,139,250,.2); border-color: rgba(167,139,250,.55); color: #ddd6fe; }
+#stopBtn {
+  pointer-events: auto; padding: 8px 18px; font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px);
+}
+
+#panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: none;
+  flex-direction: column; gap: 10px; padding: 14px 16px 20px;
+  background: linear-gradient(0deg, rgba(3,10,14,.92) 30%, rgba(3,10,14,0));
+  pointer-events: none;
+}
+#panel .row { display: flex; gap: 10px; pointer-events: auto; }
+#status {
+  align-self: center; font-size: 13px; font-weight: 800; letter-spacing: .4px;
+  padding: 7px 18px; border-radius: 999px; transition: all .25s;
+}
+#status.closed { background: rgba(52,211,153,.18); border: 1px solid rgba(52,211,153,.6); color: #b9ffe6; }
+#status.open { background: rgba(255,107,107,.16); border: 1px solid rgba(255,107,107,.55); color: #ffc9c9; }
+.sw.cut.on { background: rgba(255,107,107,.16); border-color: rgba(255,107,107,.55); color: #ffd9d9; }
+.sw.cut.on .dot { background: #ff6b6b; box-shadow: 0 0 10px 2px rgba(255,107,107,.75); }
+.sw {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 8px; font-size: 13px; font-weight: 700;
+  background: rgba(255,255,255,.07); color: #93a7ad;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 14px;
+  cursor: pointer; backdrop-filter: blur(8px); transition: all .2s;
+}
+.sw .dot { width: 9px; height: 9px; border-radius: 50%; background: #46555a; transition: all .2s; }
+.sw.on { background: rgba(52,211,153,.16); border-color: rgba(52,211,153,.55); color: #d6fff2; }
+.sw.on .dot { background: #34d399; box-shadow: 0 0 10px 2px rgba(52,211,153,.75); }
+.sw.main.on { background: rgba(250,204,21,.16); border-color: rgba(250,204,21,.55); color: #fff7d6; }
+.sw.main.on .dot { background: #facc15; box-shadow: 0 0 10px 2px rgba(250,204,21,.75); }
+.sw:active { transform: scale(.97); }
+#info { text-align: center; font-size: 12.5px; line-height: 1.5; color: #7fd8c4; padding: 2px 6px 0; min-height: 16px; }
+
+@media (max-width: 480px) {
+  #overlay h1 { font-size: 28px; }
+  #startBtn, #demoBtn { padding: 12px 24px; font-size: 15px; }
+  .sw { font-size: 12px; padding: 12px 6px; }
+}
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <h1>AR Praktikum Elektronika</h1>
+  <p class="sub">Rangkaian Terbuka &amp; Tertutup — buka dan tutup saklar atau putuskan kabel, lalu amati kapan lampu menyala dan arus mengalir.</p>
+  <div class="btn-row">
+    <button id="startBtn">Mulai AR</button>
+    <button id="demoBtn">Mode 3D</button>
+  </div>
+  <p id="statusMsg"></p>
+</div>
+
+<div id="hud">
+  <div class="left">
+    <span id="modeBadge">AR</span>
+    <span id="hudText">Arahkan kamera ke gambar target…</span>
+  </div>
+  <button id="stopBtn">Stop</button>
+</div>
+
+<div id="panel">
+  <div id="status" class="open">RANGKAIAN TERBUKA</div>
+  <div class="row">
+    <button class="sw main" id="btnSwitch"><span class="dot"></span><span id="btnSwitchTxt">Saklar: TERBUKA</span></button>
+    <button class="sw cut" id="btnCut"><span class="dot"></span><span id="btnCutTxt">Kabel: UTUH</span></button>
+  </div>
+  <div id="info"></div>
+</div>
+
+<div id="container"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from 'mindar-image-three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ───────── KONFIGURASI ─────────
+const IMAGE_TARGET_SRC = 'targets/bumi.mind';
+const AR_SCALE = 0.6;   // ukuran rangkaian relatif terhadap gambar target (lebar target = 1)
+
+// Satu loop: baterai + saklar di bawah, lampu di atas.
+const RAIL_L = -0.55, RAIL_R = 0.55, Y_BOT = -0.35, Y_TOP = 0.38;
+const BAT_X0 = -0.38, BAT_X1 = -0.08, SW_X = 0.28, LAMP_X = 0.0;
+const SW_GAP = 0.11, LAMP_GAP = 0.10, WIRE_R = 0.016;
+const CUT_Y0 = -0.10, CUT_Y1 = 0.10;   // bagian kabel kanan yang bisa diputus
+
+// ───────── DOM ─────────
+const $ = (id) => document.getElementById(id);
+const startBtn = $('startBtn'), demoBtn = $('demoBtn'), stopBtn = $('stopBtn');
+const overlay = $('overlay'), hud = $('hud'), hudText = $('hudText'), modeBadge = $('modeBadge');
+const panel = $('panel'), container = $('container'), statusMsg = $('statusMsg'), infoEl = $('info');
+const statusEl = $('status'), btnSwitch = $('btnSwitch'), btnCut = $('btnCut');
+const btnSwitchTxt = $('btnSwitchTxt'), btnCutTxt = $('btnCutTxt');
+
+// ───────── STATE ─────────
+const state = { main: false, cut: false };   // main = saklar tertutup?, cut = kabel putus?
+let mindarThree = null, mode3D = null, currentMode = null, circuit = null;
+let arRenderer = null, arScene = null, arCamera = null;
+const clock = new THREE.Clock();
+
+// ───────── HELPER ─────────
+const wireMat = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: 0.92, roughness: 0.28 });
+
+function makeWire(x1, y1, x2, y2, r = WIRE_R) {
+  const a = new THREE.Vector3(x1, y1, 0), b = new THREE.Vector3(x2, y2, 0);
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r, r, a.distanceTo(b), 14), wireMat);
+  mesh.position.copy(a).lerp(b, 0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+  return mesh;
+}
+
+// Bola kecil penutup sambungan/sudut kabel supaya tidak ada celah
+const jointGeo = new THREE.SphereGeometry(WIRE_R * 1.35, 14, 14);
+function addJoint(parent, x, y) {
+  const m = new THREE.Mesh(jointGeo, wireMat);
+  m.position.set(x, y, 0);
+  parent.add(m);
+}
+
+function makeLabel(text, color = '#8ef7ff') {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.font = 'bold 68px -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = color; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 14;
+  ctx.fillText(text, 256, 68);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 4;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, depthTest: false, depthWrite: false,
+  }));
+  sprite.scale.set(0.30, 0.075, 1);
+  return sprite;
+}
+
+// Tekstur cahaya lembut (radial) untuk halo lampu
+function makeGlowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  const gr = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0.00, 'rgba(255,240,180,1)');
+  gr.addColorStop(0.22, 'rgba(255,196,90,0.60)');
+  gr.addColorStop(0.55, 'rgba(255,150,40,0.16)');
+  gr.addColorStop(1.00, 'rgba(255,140,30,0)');
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+const glowTex = makeGlowTexture();
+
+// ───────── LAMPU ─────────
+// Terminal kiri/kanan (di x = ±LAMP_GAP) dihubungkan langsung ke dudukan lampu,
+// sehingga kabel dari rel/baterai benar-benar tersambung ke lampu.
+function createLamp(labelText) {
+  const g = new THREE.Group();
+
+  // Terminal + kabel penghubung ke dudukan
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffc107, metalness: 0.9, roughness: 0.25 });
+  const postGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.05, 14);
+  const p1 = new THREE.Mesh(postGeo, postMat); p1.position.set(-LAMP_GAP, 0.02, 0);
+  const p2 = new THREE.Mesh(postGeo, postMat); p2.position.set(LAMP_GAP, 0.02, 0);
+  g.add(p1, p2);
+  g.add(makeWire(-LAMP_GAP, 0, -0.045, 0));
+  g.add(makeWire(0.045, 0, LAMP_GAP, 0));
+
+  // Badan lampu (sedikit diperkecil)
+  const body = new THREE.Group();
+  body.scale.setScalar(0.9);
+  g.add(body);
+
+  // Dudukan ulir (screw base)
+  const metal = new THREE.MeshStandardMaterial({ color: 0xc4ccd2, metalness: 0.95, roughness: 0.3 });
+  const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.046, 0.07, 28), metal);
+  sleeve.position.y = 0.005; body.add(sleeve);
+  const ringGeo = new THREE.TorusGeometry(0.047, 0.005, 8, 28);
+  [-0.015, 0.0, 0.015, 0.03].forEach((y) => {
+    const ring = new THREE.Mesh(ringGeo, metal);
+    ring.rotation.x = Math.PI / 2; ring.position.y = y; body.add(ring);
+  });
+  const collar = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.05, 0.05, 0.012, 28),
+    new THREE.MeshStandardMaterial({ color: 0x2b2f33, roughness: 0.6, metalness: 0.3 })
+  );
+  collar.position.y = 0.046; body.add(collar);
+  const insul = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.038, 0.038, 0.01, 20),
+    new THREE.MeshStandardMaterial({ color: 0x1a1d20, roughness: 0.7 })
+  );
+  insul.position.y = -0.033; body.add(insul);
+  const contact = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.018, 0.018, 0.01, 16),
+    new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: 0.95, roughness: 0.25 })
+  );
+  contact.position.y = -0.041; body.add(contact);
+
+  // Bohlam kaca (profil klasik, dibuat dengan Lathe)
+  const prof = new THREE.SplineCurve([
+    new THREE.Vector2(0.034, 0.052), new THREE.Vector2(0.036, 0.070),
+    new THREE.Vector2(0.046, 0.092), new THREE.Vector2(0.063, 0.112),
+    new THREE.Vector2(0.078, 0.132), new THREE.Vector2(0.084, 0.155),
+    new THREE.Vector2(0.080, 0.178), new THREE.Vector2(0.068, 0.200),
+    new THREE.Vector2(0.048, 0.220), new THREE.Vector2(0.024, 0.233),
+    new THREE.Vector2(0.000, 0.237),
+  ]).getPoints(48);
+  const bulbMat = new THREE.MeshStandardMaterial({
+    color: 0xe6f4ff, emissive: 0xffb347, emissiveIntensity: 0,
+    transparent: true, opacity: 0.28, roughness: 0.04, metalness: 0.05,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const bulb = new THREE.Mesh(new THREE.LatheGeometry(prof, 36), bulbMat);
+  body.add(bulb);
+
+  // Tiang kaca + penyangga filamen
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.008, 0.011, 0.055, 12),
+    new THREE.MeshStandardMaterial({ color: 0xcfe3ee, transparent: true, opacity: 0.55, roughness: 0.2 })
+  );
+  stem.position.y = 0.0775; body.add(stem);
+  body.add(makeWire(-0.005, 0.098, -0.022, 0.150, 0.0035));
+  body.add(makeWire(0.005, 0.098, 0.022, 0.150, 0.0035));
+
+  // Filamen berbentuk koil
+  const pts = [];
+  const N = 90, turns = 7;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N, a = t * Math.PI * 2 * turns;
+    pts.push(new THREE.Vector3(-0.022 + 0.044 * t, 0.150 + 0.008 * Math.sin(a), 0.008 * Math.cos(a)));
+  }
+  const filOff = new THREE.Color(0x6a5a48), filOn = new THREE.Color(0xfff2b8);
+  const filMat = new THREE.MeshStandardMaterial({
+    color: filOff.clone(), emissive: 0xff9a1a, emissiveIntensity: 0, metalness: 0.6, roughness: 0.4,
+  });
+  const filament = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.0035, 6, false), filMat
+  );
+  body.add(filament);
+
+  // Inti cahaya (menyala di dalam bohlam)
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.05, 20, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xffe08a, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    })
+  );
+  core.position.y = 0.150; body.add(core);
+
+  // Halo cahaya
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTex, transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  halo.position.y = 0.150; halo.scale.set(0.45, 0.45, 1); body.add(halo);
+
+  const light = new THREE.PointLight(0xffcc55, 0, 1.8, 1.4);
+  light.position.y = 0.150; body.add(light);
+
+  const lbl = makeLabel(labelText, '#9ef7ff');
+  lbl.position.set(0, -0.17, 0); body.add(lbl);
+
+  g.userData = { bulbMat, filMat, filOff, filOn, core, halo, light };
+  return g;
+}
+
+function createSwitch(labelText, swId) {
+  const g = new THREE.Group();
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffc107, metalness: 0.9, roughness: 0.25 });
+  const postGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.05, 14);
+  const p1 = new THREE.Mesh(postGeo, postMat); p1.position.set(-SW_GAP, 0.02, 0);
+  const p2 = new THREE.Mesh(postGeo, postMat); p2.position.set(SW_GAP, 0.02, 0);
+  g.add(p1, p2);
+
+  const lever = new THREE.Group();
+  const armMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.55, roughness: 0.4 });
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(SW_GAP * 2, 0.03, 0.03), armMat);
+  arm.position.x = SW_GAP; lever.add(arm);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 16), armMat);
+  knob.position.x = SW_GAP * 2; lever.add(knob);
+  lever.position.set(-SW_GAP, 0.038, 0);
+  g.add(lever);
+
+  const hit = new THREE.Mesh(
+    new THREE.BoxGeometry(SW_GAP * 2 + 0.24, 0.24, 0.24),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+  );
+  hit.position.set(0, 0.04, 0); g.add(hit);
+
+  const lbl = makeLabel(labelText, '#ffd166');
+  lbl.position.set(0, 0.16, 0); g.add(lbl);
+
+  g.userData = { lever, swId };
+  g.traverse((o) => { o.userData.swId = swId; });
+  return g;
+}
+
+// ───────── PATH ELEKTRON ─────────
+// Elektron keluar dari kutub (−) baterai → rel kiri → lampu → rel kanan → saklar → kutub (+).
+function makeLoopPath() {
+  const pts = [
+    [BAT_X0, Y_BOT], [RAIL_L, Y_BOT], [RAIL_L, Y_TOP], [RAIL_R, Y_TOP],
+    [RAIL_R, Y_BOT], [SW_X, Y_BOT], [BAT_X1, Y_BOT],
+  ].map((p) => new THREE.Vector3(p[0], p[1], 0));
+  const segs = []; let total = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length], len = a.distanceTo(b);
+    segs.push({ a, b, len, start: total }); total += len;
+  }
+  return { segs, total };
+}
+
+const _tmpV = new THREE.Vector3();
+function pointAt(path, s) {
+  s = ((s % path.total) + path.total) % path.total;
+  for (const seg of path.segs) {
+    if (s <= seg.start + seg.len) return _tmpV.copy(seg.a).lerp(seg.b, (s - seg.start) / seg.len);
+  }
+  return _tmpV.copy(path.segs[path.segs.length - 1].b);
+}
+
+// ───────── BUILD RANGKAIAN ─────────
+function buildCircuit(parent) {
+  const root = new THREE.Group();
+  parent.add(root);
+
+  const board = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 1.34, 0.05),
+    new THREE.MeshStandardMaterial({ color: 0x0f3b30, roughness: 0.75, metalness: 0.15 })
+  );
+  board.position.set(0, 0.04, -0.07); root.add(board);
+
+  // Rel kiri (utuh) & kanan (dengan bagian yang bisa diputus)
+  root.add(makeWire(RAIL_L, Y_BOT, RAIL_L, Y_TOP));
+  root.add(makeWire(RAIL_R, Y_BOT, RAIL_R, CUT_Y0));
+  const cutWire = makeWire(RAIL_R, CUT_Y0, RAIL_R, CUT_Y1);
+  root.add(cutWire);
+  root.add(makeWire(RAIL_R, CUT_Y1, RAIL_R, Y_TOP));
+
+  // Baris bawah: rel kiri → baterai → saklar → rel kanan
+  root.add(makeWire(RAIL_L, Y_BOT, BAT_X0, Y_BOT));
+  root.add(makeWire(BAT_X1, Y_BOT, SW_X - SW_GAP, Y_BOT));
+  root.add(makeWire(SW_X + SW_GAP, Y_BOT, RAIL_R, Y_BOT));
+
+  // Baris atas: rel kiri → lampu → rel kanan
+  root.add(makeWire(RAIL_L, Y_TOP, LAMP_X - LAMP_GAP, Y_TOP));
+  root.add(makeWire(LAMP_X + LAMP_GAP, Y_TOP, RAIL_R, Y_TOP));
+
+  // Sambungan sudut & ujung kabel putus
+  addJoint(root, RAIL_L, Y_BOT); addJoint(root, RAIL_R, Y_BOT);
+  addJoint(root, RAIL_L, Y_TOP); addJoint(root, RAIL_R, Y_TOP);
+  addJoint(root, RAIL_R, CUT_Y0); addJoint(root, RAIL_R, CUT_Y1);
+
+  // ── Baterai (silinder dengan terminal + dan −) ──
+  const batCx = (BAT_X0 + BAT_X1) / 2;
+  const steel = new THREE.MeshStandardMaterial({ color: 0xd5dbe0, metalness: 0.95, roughness: 0.25 });
+
+  const capNeg = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.012, 24), steel);
+  capNeg.rotation.z = Math.PI / 2; capNeg.position.set(BAT_X0 + 0.006, Y_BOT, 0); root.add(capNeg);
+
+  const bodyX0 = BAT_X0 + 0.012, bodyX1 = BAT_X1 - 0.03;
+  const batBody = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.075, 0.075, bodyX1 - bodyX0, 28),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.7 })
+  );
+  batBody.rotation.z = Math.PI / 2; batBody.position.set((bodyX0 + bodyX1) / 2, Y_BOT, 0); root.add(batBody);
+
+  const sleeve = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.0775, 0.0775, 0.19, 28),
+    new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.45, metalness: 0.35 })
+  );
+  sleeve.rotation.z = Math.PI / 2; sleeve.position.set(batCx - 0.025, Y_BOT, 0); root.add(sleeve);
+
+  const nubPos = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.03, 20), steel);
+  nubPos.rotation.z = Math.PI / 2; nubPos.position.set(BAT_X1 - 0.015, Y_BOT, 0); root.add(nubPos);
+
+  const lblPlus = makeLabel('+', '#ff8a80');
+  lblPlus.scale.set(0.14, 0.09, 1); lblPlus.position.set(BAT_X1 - 0.03, Y_BOT + 0.16, 0); root.add(lblPlus);
+  const lblMin = makeLabel('−', '#8ecbff');
+  lblMin.scale.set(0.14, 0.09, 1); lblMin.position.set(BAT_X0 + 0.03, Y_BOT + 0.16, 0); root.add(lblMin);
+  const lblBat = makeLabel('BATERAI', '#c7d2fe');
+  lblBat.position.set(batCx, Y_BOT - 0.17, 0); root.add(lblBat);
+
+  // ── Saklar ──
+  const mainSwitch = createSwitch('SAKLAR', 'main');
+  mainSwitch.position.set(SW_X, Y_BOT, 0); root.add(mainSwitch);
+
+  // ── Lampu ──
+  const lamp = createLamp('LAMPU');
+  lamp.position.set(LAMP_X, Y_TOP, 0); root.add(lamp);
+
+  // ── Label status di tengah rangkaian ──
+  const lblClosed = makeLabel('TERTUTUP · ARUS MENGALIR', '#6ee7b7');
+  lblClosed.scale.set(0.78, 0.195, 1); lblClosed.position.set(0, -0.02, 0.05); root.add(lblClosed);
+  const lblOpen = makeLabel('TERBUKA · ARUS TERPUTUS', '#ff8a8a');
+  lblOpen.scale.set(0.78, 0.195, 1); lblOpen.position.set(0, -0.02, 0.05); root.add(lblOpen);
+
+  // Tanda "putus" di kabel kanan
+  const lblBreak = makeLabel('PUTUS', '#ff6b6b');
+  lblBreak.scale.set(0.2, 0.05, 1); lblBreak.position.set(RAIL_R - 0.17, 0, 0.05); root.add(lblBreak);
+
+  // ── Elektron ──
+  const electronGeo = new THREE.SphereGeometry(0.018, 10, 10);
+  const electronMat = new THREE.MeshBasicMaterial({ color: 0x6ff2ff });
+  const ELECTRON_COUNT = 14;
+  const path = makeLoopPath();
+  const electrons = [], eGroup = new THREE.Group();
+  for (let i = 0; i < ELECTRON_COUNT; i++) {
+    const e = new THREE.Mesh(electronGeo, electronMat);
+    e.userData.phase = i / ELECTRON_COUNT;
+    eGroup.add(e); electrons.push(e);
+  }
+  eGroup.visible = false; root.add(eGroup);
+
+  const starGeo = new THREE.BufferGeometry();
+  const starPos = new Float32Array(160 * 3);
+  for (let i = 0; i < starPos.length; i++) starPos[i] = (Math.random() - 0.5) * 3.2;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.006, transparent: true, opacity: 0.5, sizeAttenuation: true, depthWrite: false,
+  }));
+  stars.position.set(0, 0.1, -0.4); root.add(stars);
+
+  return {
+    root, stars, mainSwitch, mainLever: mainSwitch.userData.lever,
+    lamp, cutWire, lblClosed, lblOpen, lblBreak,
+    path, electrons, electronGroup: eGroup, glow: 0,
+    tappables: [mainSwitch],
+  };
+}
+
+// ───────── ANIMASI ─────────
+const ELECTRON_SPEED = 1.05;
+let electronClock = 0;
+const isClosed = () => state.main && !state.cut;
+
+function updateCircuit(dt) {
+  if (!circuit) return;
+  electronClock += dt;
+  const k = Math.min(1, dt * 14);
+  const conducting = isClosed();
+
+  circuit.mainLever.rotation.z += ((state.main ? 0 : 0.95) - circuit.mainLever.rotation.z) * k;
+
+  circuit.glow += ((conducting ? 1 : 0) - circuit.glow) * Math.min(1, dt * 8);
+  const b = circuit;
+  const ud = b.lamp.userData;
+  const pulse = 1 + 0.035 * Math.sin(electronClock * 9);
+
+  ud.bulbMat.emissiveIntensity = b.glow * 1.6;
+  ud.bulbMat.opacity = 0.28 + b.glow * 0.40;
+  ud.filMat.emissiveIntensity = b.glow * 3.5;
+  ud.filMat.color.copy(ud.filOff).lerp(ud.filOn, b.glow);
+  ud.core.material.opacity = b.glow * 0.55;
+  ud.halo.visible = b.glow > 0.01;
+  ud.halo.material.opacity = b.glow * 0.95;
+  ud.halo.scale.set(0.45 * pulse * (0.8 + 0.2 * b.glow), 0.45 * pulse * (0.8 + 0.2 * b.glow), 1);
+  ud.light.intensity = b.glow * 1.1 * pulse;
+
+  b.electronGroup.visible = conducting;
+  if (conducting) {
+    b.electrons.forEach((e) => {
+      const s = (electronClock * ELECTRON_SPEED + e.userData.phase * b.path.total) % b.path.total;
+      e.position.copy(pointAt(b.path, s));
+    });
+  }
+
+  // label "PUTUS" berkedip saat kabel terputus
+  b.lblBreak.material.opacity = 0.65 + 0.35 * Math.sin(electronClock * 6);
+
+  if (circuit.stars) circuit.stars.rotation.z += dt * 0.02;
+}
+
+// ───────── UI ─────────
+function syncUI() {
+  const closed = isClosed();
+
+  btnSwitch.classList.toggle('on', state.main);
+  btnSwitchTxt.textContent = 'Saklar: ' + (state.main ? 'TERTUTUP' : 'TERBUKA');
+  btnCut.classList.toggle('on', state.cut);
+  btnCutTxt.textContent = 'Kabel: ' + (state.cut ? 'PUTUS' : 'UTUH');
+
+  statusEl.className = closed ? 'closed' : 'open';
+  statusEl.textContent = closed ? 'RANGKAIAN TERTUTUP ✓' : 'RANGKAIAN TERBUKA ✗';
+
+  if (closed) infoEl.textContent = 'Jalur arus tidak terputus dari kutub (−) ke kutub (+) → arus mengalir, lampu menyala.';
+  else if (state.cut && state.main) infoEl.textContent = 'Saklar tertutup, tetapi kabel putus → jalur terputus, arus tidak mengalir, lampu padam.';
+  else if (state.cut) infoEl.textContent = 'Saklar terbuka dan kabel putus → jalur terputus, lampu padam.';
+  else infoEl.textContent = 'Saklar terbuka → jalur terputus, arus tidak mengalir, lampu padam. Tutup saklar!';
+
+  if (circuit) {
+    circuit.lblClosed.visible = closed;
+    circuit.lblOpen.visible = !closed;
+    circuit.cutWire.visible = !state.cut;
+    circuit.lblBreak.visible = state.cut;
+  }
+}
+function toggle(id) { state[id] = !state[id]; syncUI(); }
+
+btnSwitch.addEventListener('click', () => toggle('main'));
+btnCut.addEventListener('click', () => toggle('cut'));
+
+// Tap saklar 3D
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+function onPointerDown(e) {
+  if (!circuit) return;
+  if (e.target.closest && e.target.closest('#panel, #hud, #overlay')) return;
+
+  let renderer, camera;
+  if (currentMode === 'ar') { renderer = arRenderer; camera = arCamera; }
+  else if (currentMode === '3d' && mode3D) { renderer = mode3D.renderer; camera = mode3D.camera; }
+  if (!renderer || !camera) return;
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+  pointer.set((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(circuit.tappables, true);
+  if (hits.length) {
+    const id = hits[0].object.userData.swId;
+    if (id) toggle(id);
+  }
+}
+
+// ───────── CEK FILE .MIND ─────────
+async function mindFileExists() {
+  try {
+    let res = await fetch(IMAGE_TARGET_SRC, { method: 'HEAD', cache: 'no-store' });
+    if (res.status === 405 || res.status === 501) res = await fetch(IMAGE_TARGET_SRC, { cache: 'no-store' });
+    return res.ok;
+  } catch { return false; }
+}
+
+function addLights(scene) {
+  scene.add(new THREE.HemisphereLight(0xbfe9ff, 0x203030, 1.5));
+  const d = new THREE.DirectionalLight(0xffffff, 1.5); d.position.set(0.8, 1.6, 1.2); scene.add(d);
+  const f = new THREE.DirectionalLight(0xaaccff, 0.7); f.position.set(-1, 0.6, 0.8); scene.add(f);
+  const r = new THREE.DirectionalLight(0x66ffcc, 0.5); r.position.set(0, -1, 0.6); scene.add(r);
+}
+
+// ───────── START AR ─────────
+async function startAR() {
+  startBtn.disabled = true; demoBtn.disabled = true;
+  statusMsg.classList.remove('error');
+  statusMsg.textContent = 'Menyiapkan AR...';
+
+  if (!(await mindFileExists())) {
+    console.warn('[AR] File .mind tidak ditemukan:', IMAGE_TARGET_SRC);
+    statusMsg.classList.add('error');
+    statusMsg.textContent = 'File ' + IMAGE_TARGET_SRC + ' tidak ditemukan. Beralih ke Mode 3D…';
+    setTimeout(() => start3DMode('Mode 3D — file target AR belum tersedia.'), 900);
+    return;
+  }
+
+  try {
+    statusMsg.textContent = 'Meminta izin kamera...';
+
+    // PENTING: container harus terlihat SEBELUM MindAR dibuat,
+    // supaya ukuran renderer & proyeksi kamera dihitung benar.
+    container.innerHTML = '';
+    container.className = 'mode-ar';
+    container.style.display = 'block';
+
+    mindarThree = new MindARThree({ container, imageTargetSrc: IMAGE_TARGET_SRC });
+    arRenderer = mindarThree.renderer;
+    arScene = mindarThree.scene;
+    arCamera = mindarThree.camera;
+
+    addLights(arScene);
+
+    const anchor = mindarThree.addAnchor(0);
+    circuit = buildCircuit(anchor.group);
+    circuit.root.scale.setScalar(AR_SCALE);
+
+    anchor.onTargetFound = () => { hudText.textContent = 'Target terdeteksi ✓ — ketuk saklar atau tombol di bawah'; };
+    anchor.onTargetLost = () => { hudText.textContent = 'Arahkan kamera ke gambar target…'; };
+
+    await mindarThree.start();
+    currentMode = 'ar';
+
+    overlay.style.display = 'none';
+    hud.style.display = 'flex';
+    panel.style.display = 'flex';
+    modeBadge.textContent = 'AR';
+    modeBadge.classList.remove('mode-3d');
+    hudText.textContent = 'Arahkan kamera ke gambar target…';
+    syncUI();
+
+    window.addEventListener('pointerdown', onPointerDown);
+
+    clock.start();
+    arRenderer.setAnimationLoop(() => {
+      updateCircuit(Math.min(clock.getDelta(), 0.05));
+      arRenderer.render(arScene, arCamera);
+    });
+    statusMsg.textContent = '';
+  } catch (err) {
+    console.error('[AR] Gagal:', err);
+    try {
+      if (mindarThree && mindarThree.renderer) mindarThree.renderer.setAnimationLoop(null);
+      if (mindarThree && mindarThree.stop) await mindarThree.stop();
+    } catch (_) {}
+    mindarThree = null; arRenderer = null; arScene = null; arCamera = null; circuit = null;
+    container.style.display = 'none';
+    container.innerHTML = '';
+    start3DMode('AR tidak dapat dimulai (kamera/target bermasalah). Mode 3D aktif.');
+  }
+}
+
+// ───────── MODE 3D ─────────
+function start3DMode(note = '') {
+  container.innerHTML = '';
+  container.className = 'mode-3d';
+  container.style.display = 'block';
+
+  const w = window.innerWidth, h = window.innerHeight;
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h);
+  if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0b0f14);
+  const grid = new THREE.GridHelper(4, 40, 0x1f3b34, 0x142822);
+  grid.position.y = -0.75; scene.add(grid);
+
+  const camera = new THREE.PerspectiveCamera(48, w / h, 0.1, 100);
+  camera.position.set(0.05, 0.55, 1.85);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0.03, 0);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 0.8; controls.maxDistance = 4;
+  controls.panSpeed = 0.6;
+
+  addLights(scene);
+  circuit = buildCircuit(scene);
+
+  const mode = { renderer, scene, camera, controls, animId: 0, onResize: null };
+  const c3 = new THREE.Clock();
+  (function loop() {
+    mode.animId = requestAnimationFrame(loop);
+    updateCircuit(Math.min(c3.getDelta(), 0.05));
+    controls.update();
+    renderer.render(scene, camera);
+  })();
+
+  mode.onResize = () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+  window.addEventListener('resize', mode.onResize);
+  mode3D = mode;
+  currentMode = '3d';
+
+  overlay.style.display = 'none';
+  hud.style.display = 'flex';
+  panel.style.display = 'flex';
+  modeBadge.textContent = '3D';
+  modeBadge.classList.add('mode-3d');
+  hudText.textContent = 'Geser = putar · Cubit/scroll = zoom · Ketuk saklar = nyala/mati';
+  syncUI();
+
+  window.addEventListener('pointerdown', onPointerDown);
+  statusMsg.classList.remove('error');
+  statusMsg.textContent = note || '';
+  startBtn.disabled = false; demoBtn.disabled = false;
+}
+
+// ───────── STOP ─────────
+async function stopAR() {
+  window.removeEventListener('pointerdown', onPointerDown);
+
+  if (currentMode === 'ar' && mindarThree) {
+    try {
+      if (mindarThree.renderer) mindarThree.renderer.setAnimationLoop(null);
+      if (mindarThree.stop) await mindarThree.stop();
+    } catch (_) {}
+    mindarThree = null; arRenderer = null; arScene = null; arCamera = null;
+  } else if (currentMode === '3d' && mode3D) {
+    cancelAnimationFrame(mode3D.animId);
+    window.removeEventListener('resize', mode3D.onResize);
+    try { mode3D.controls.dispose(); } catch (_) {}
+    try { mode3D.renderer.dispose(); } catch (_) {}
+    mode3D = null;
+  }
+
+  container.innerHTML = '';
+  container.style.display = 'none';
+  hud.style.display = 'none';
+  panel.style.display = 'none';
+  overlay.style.display = 'flex';
+  statusMsg.textContent = '';
+  statusMsg.classList.remove('error');
+
+  state.main = false; state.cut = false;
+  circuit = null; currentMode = null;
+  syncUI();
+  startBtn.disabled = false; demoBtn.disabled = false;
+}
+
+startBtn.addEventListener('click', startAR);
+demoBtn.addEventListener('click', () => start3DMode('Mode 3D — tanpa kamera.'));
+stopBtn.addEventListener('click', stopAR);
+</script>
+</body>
+</html>
